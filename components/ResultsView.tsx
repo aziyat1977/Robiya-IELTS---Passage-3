@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, Home } from 'lucide-react';
+import { CheckCircle, XCircle, Home, ArrowRight, Activity } from 'lucide-react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 
 const AnimatedNumber = ({ value }: { value: number }) => {
@@ -73,7 +73,7 @@ const ResultsView: React.FC = () => {
         className="absolute bottom-20 right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-[80px]" 
       />
 
-      <div className="max-w-5xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0, rotateX: 20 }}
           animate={{ scale: 1, opacity: 1, rotateX: 0 }}
@@ -131,8 +131,9 @@ const ResultsView: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="bg-slate-900/50 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden shadow-2xl"
         >
-          <div className="px-8 py-6 border-b border-white/10 bg-black/20 font-bold text-slate-300 uppercase tracking-widest text-sm">
-            Performance Log
+          <div className="px-8 py-6 border-b border-white/10 bg-black/20 font-bold text-slate-300 uppercase tracking-widest text-sm flex justify-between items-center">
+             <span>Diagnostic Log</span>
+             <span className="text-xs text-slate-500">Click question for deep analysis</span>
           </div>
           <div className="divide-y divide-white/5">
             {allQuestions.map((q, idx) => {
@@ -140,47 +141,52 @@ const ResultsView: React.FC = () => {
               const isCorrect = userAns?.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
 
               return (
-                <motion.div 
-                  key={q.id} 
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.05 }}
-                  className="p-6 hover:bg-white/5 transition-colors flex flex-col md:flex-row gap-6 group"
-                >
-                  <div className="flex-shrink-0">
-                    <div className={`
-                        w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg border transform group-hover:scale-110 transition-transform
-                        ${isCorrect 
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
-                            : 'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
-                        }
-                    `}>
-                      {q.id}
+                <Link to={`/reading/explanation/${q.id}`} key={q.id}>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.05 }}
+                    className="p-6 hover:bg-white/5 transition-colors flex flex-col md:flex-row gap-6 group cursor-pointer"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className={`
+                          w-12 h-12 rounded-xl flex items-center justify-center font-black text-lg border transform group-hover:scale-110 transition-transform
+                          ${isCorrect 
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.2)]' 
+                              : 'bg-red-500/10 text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                          }
+                      `}>
+                        {q.id}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-grow">
-                    <div className="mb-3 font-medium text-slate-200 text-lg">
-                        {q.text || <span className="text-slate-400 italic">Question Type: {q.type}</span>} 
-                        {q.target && <span className="text-purple-400 font-bold ml-2">[{q.target}]</span>}
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div className={`p-4 rounded-lg border ${isCorrect ? 'bg-emerald-900/20 border-emerald-500/20' : 'bg-red-900/20 border-red-500/20'}`}>
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">User Input</span>
-                        <div className={`font-mono font-bold ${isCorrect ? 'text-emerald-300' : 'text-red-300'}`}>
-                            {userAns || <span className="opacity-50">NO DATA</span>}
+                    <div className="flex-grow">
+                      <div className="mb-3 font-medium text-slate-200 text-lg flex items-center">
+                          {q.text || <span className="text-slate-400 italic">Question Type: {q.type}</span>} 
+                          {q.target && <span className="text-purple-400 font-bold ml-2">[{q.target}]</span>}
+                          <Activity className="w-4 h-4 ml-3 opacity-0 group-hover:opacity-100 text-blue-400 transition-opacity" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className={`p-4 rounded-lg border ${isCorrect ? 'bg-emerald-900/20 border-emerald-500/20' : 'bg-red-900/20 border-red-500/20'}`}>
+                          <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">User Input</span>
+                          <div className={`font-mono font-bold ${isCorrect ? 'text-emerald-300' : 'text-red-300'}`}>
+                              {userAns || <span className="opacity-50">NO DATA</span>}
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-lg border bg-slate-800/50 border-white/10">
+                          <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Expected Output</span>
+                          <div className="font-mono font-bold text-white">{q.correctAnswer}</div>
                         </div>
                       </div>
-                      <div className="p-4 rounded-lg border bg-slate-800/50 border-white/10">
-                        <span className="block text-[10px] text-slate-400 uppercase font-bold mb-1">Expected Output</span>
-                        <div className="font-mono font-bold text-white">{q.correctAnswer}</div>
-                      </div>
                     </div>
-                  </div>
-                  <div className="flex-shrink-0 flex items-center justify-center opacity-50 group-hover:opacity-100 transition-opacity">
-                      {isCorrect ? <CheckCircle className="w-8 h-8 text-emerald-500" /> : <XCircle className="w-8 h-8 text-red-500" />}
-                  </div>
-                </motion.div>
+                    <div className="flex-shrink-0 flex items-center justify-center opacity-50 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 group-hover:bg-blue-600 group-hover:border-blue-500 transition-colors">
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 group-hover:text-white">Analysis</span>
+                            <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-white" />
+                        </div>
+                    </div>
+                  </motion.div>
+                </Link>
               );
             })}
           </div>

@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import LessonMode from './components/LessonMode';
 import TestPlayer from './components/TestPlayer';
 import ResultsView from './components/ResultsView';
+import ExplanationView from './components/ExplanationView'; // New Import
 import { AnimatePresence } from 'framer-motion';
 
 const AnimatedRoutes = () => {
@@ -19,6 +20,7 @@ const AnimatedRoutes = () => {
         <Route path="/reading/grammar" element={<LessonMode />} />
         <Route path="/reading/test" element={<TestPlayer />} />
         <Route path="/reading/results" element={<ResultsView />} />
+        <Route path="/reading/explanation/:id" element={<ExplanationView />} /> {/* New Route */}
       </Routes>
     </AnimatePresence>
   );

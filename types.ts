@@ -12,13 +12,13 @@ export interface QuizOption {
 export interface VocabItem {
   word: string;
   definition: string;
-  speakingQuestions: string[]; // New: Questions for speaking practice
-  quiz: QuizOption[]; // Changed to array for multiple quizzes per word
+  speakingQuestions: string[];
+  quiz: QuizOption[];
 }
 
 export interface GrammarStep {
   text: string;
-  highlightIndices: number[]; // Indices of words to highlight/animate
+  highlightIndices: number[];
   annotation: string;
 }
 
@@ -36,7 +36,7 @@ export interface GrammarExample {
 export interface GrammarSection {
   topic: string;
   content: string; 
-  visuals: GrammarVisual[]; // New: For animated explanations
+  visuals: GrammarVisual[];
   examples: GrammarExample[];
   quiz: QuizOption[];
 }
@@ -49,6 +49,7 @@ export interface Question {
   options?: string[];
   target?: string; 
   correctAnswer: string;
+  explanation: string; // New: Detailed analysis for the answer
 }
 
 export interface Passage {
