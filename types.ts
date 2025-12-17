@@ -1,5 +1,11 @@
 export type QuestionType = 'TFNG' | 'YES_NO_NOT_GIVEN' | 'GAP_FILL' | 'SHORT_ANSWER' | 'MATCHING_HEADINGS' | 'MCQ';
 
+export interface TranslationSet {
+  en: string;
+  ru: string;
+  uz: string;
+}
+
 export interface QuizOption {
   question: string;
   options?: string[];
@@ -11,7 +17,8 @@ export interface QuizOption {
 
 export interface VocabItem {
   word: string;
-  definition: string;
+  avatarUrl: string; // New: Image for the teacher avatar
+  definition: TranslationSet;
   speakingQuestions: string[];
   quiz: QuizOption[];
 }
@@ -30,12 +37,12 @@ export interface GrammarVisual {
 export interface GrammarExample {
   original: string;
   nominalized: string;
-  explanation: string;
+  explanation: TranslationSet;
 }
 
 export interface GrammarSection {
   topic: string;
-  content: string; 
+  content: TranslationSet;
   visuals: GrammarVisual[];
   examples: GrammarExample[];
   quiz: QuizOption[];
@@ -49,7 +56,7 @@ export interface Question {
   options?: string[];
   target?: string; 
   correctAnswer: string;
-  explanation: string; // New: Detailed analysis for the answer
+  explanation: TranslationSet;
 }
 
 export interface Passage {

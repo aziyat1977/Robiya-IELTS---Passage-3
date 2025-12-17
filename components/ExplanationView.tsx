@@ -1,8 +1,50 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useReading } from '../context/ReadingContext';
 import { ArrowLeft, ChevronLeft, ChevronRight, CheckCircle, XCircle, Search, BookOpen, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TranslationSet } from '../types';
+
+// --- Component: Translation Toggle ---
+const TranslateWrapper: React.FC<{ content: TranslationSet; className?: string }> = ({ content, className = "" }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+
+    return (
+        <div className={`flex flex-col ${className}`}>
+            <div className="text-slate-300 leading-8 text-lg" dangerouslySetInnerHTML={{ __html: content.en }} />
+            
+            <div className="flex gap-2 mt-3 select-none">
+                <button 
+                    onClick={() => setLang(lang === 'ru' ? null : 'ru')}
+                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'ru' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                >
+                    Ru
+                </button>
+                <button 
+                    onClick={() => setLang(lang === 'uz' ? null : 'uz')}
+                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'uz' ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                >
+                    Uz
+                </button>
+            </div>
+
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className={`mt-2 p-3 rounded-lg text-sm border-l-2 leading-relaxed ${lang === 'ru' ? 'bg-blue-900/20 border-blue-500 text-blue-200' : 'bg-emerald-900/20 border-emerald-500 text-emerald-200'}`}>
+                            {lang === 'ru' ? content.ru : content.uz}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
 
 const ExplanationView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -98,9 +140,7 @@ const ExplanationView: React.FC = () => {
                      Detailed Analysis
                   </h3>
                   <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-2xl border-l-4 border-purple-500 shadow-lg">
-                      <p className="text-slate-300 leading-8 text-lg">
-                          {question.explanation}
-                      </p>
+                      <TranslateWrapper content={question.explanation} />
                   </div>
                </div>
                

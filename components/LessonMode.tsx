@@ -1,14 +1,76 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight, ChevronLeft, Globe, Volume2 } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { VocabItem, GrammarVisual, GrammarExample } from '../types';
+import { VocabItem, GrammarVisual, GrammarExample, TranslationSet } from '../types';
 
 // --- Utility: Shuffle Array ---
 const shuffle = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
+
+// --- Component: Teacher Avatar & Pronunciation ---
+const TeacherAvatar: React.FC<{ word: string; avatarUrl: string }> = ({ word, avatarUrl }) => {
+    const [speaking, setSpeaking] = useState(false);
+
+    const speak = () => {
+        if (!window.speechSynthesis) return;
+        setSpeaking(true);
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-GB'; // IELTS Standard
+        utterance.rate = 0.8; // Slightly slower for clarity
+        utterance.pitch = 1;
+        
+        utterance.onend = () => setSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center mb-8">
+            <div className="relative">
+                <motion.div
+                    animate={speaking ? { 
+                        scale: [1, 1.05, 1],
+                        boxShadow: [
+                            "0 0 0 0 rgba(59, 130, 246, 0)",
+                            "0 0 0 20px rgba(59, 130, 246, 0.2)",
+                            "0 0 0 0 rgba(59, 130, 246, 0)"
+                        ]
+                    } : {}}
+                    transition={speaking ? { duration: 1, repeat: Infinity } : {}}
+                    className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white/20 overflow-hidden shadow-2xl z-10 relative bg-slate-800"
+                >
+                   <img src={avatarUrl} alt="Teacher" className="w-full h-full object-cover" />
+                </motion.div>
+                
+                {/* Audio Wave Visual (Only when speaking) */}
+                {speaking && (
+                     <div className="absolute -right-12 top-1/2 -translate-y-1/2 flex gap-1">
+                        {[1,2,3].map(i => (
+                            <motion.div 
+                                key={i}
+                                animate={{ height: [10, 40, 10] }}
+                                transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                                className="w-1.5 bg-blue-400 rounded-full"
+                            />
+                        ))}
+                     </div>
+                )}
+            </div>
+
+            <button 
+                onClick={speak}
+                disabled={speaking}
+                className="mt-6 flex items-center gap-2 px-6 py-2 bg-slate-800 hover:bg-blue-600 rounded-full transition-all border border-white/10 shadow-lg text-sm font-bold uppercase tracking-widest text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                <Volume2 className={`w-4 h-4 ${speaking ? 'animate-pulse' : ''}`} />
+                {speaking ? "Speaking..." : "Listen"}
+            </button>
+        </div>
+    );
+}
+
 
 // --- Component: Audio Recorder ---
 const AudioRecorder = ({ questionId }: { questionId: string }) => {
@@ -95,6 +157,48 @@ const AudioRecorder = ({ questionId }: { questionId: string }) => {
   );
 };
 
+// --- Component: Translation Toggle ---
+const TranslateWrapper: React.FC<{ content: TranslationSet; className?: string }> = ({ content, className = "" }) => {
+    const [lang, setLang] = useState<'ru' | 'uz' | null>(null);
+
+    return (
+        <div className={`flex flex-col ${className}`}>
+            <div dangerouslySetInnerHTML={{ __html: content.en }} />
+            
+            <div className="flex gap-2 mt-3 select-none justify-center md:justify-start">
+                <button 
+                    onClick={() => setLang(lang === 'ru' ? null : 'ru')}
+                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'ru' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                >
+                    Ru
+                </button>
+                <button 
+                    onClick={() => setLang(lang === 'uz' ? null : 'uz')}
+                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'uz' ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                >
+                    Uz
+                </button>
+            </div>
+
+            <AnimatePresence>
+                {lang && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className={`mt-2 p-3 rounded-lg text-sm border-l-2 ${lang === 'ru' ? 'bg-blue-900/20 border-blue-500 text-blue-200' : 'bg-emerald-900/20 border-emerald-500 text-emerald-200'}`}>
+                            {lang === 'ru' ? content.ru : content.uz}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+
 // --- Component: Animated Grammar Visualizer ---
 const GrammarVisualizer: React.FC<{ visual: GrammarVisual }> = ({ visual }) => {
   const [step, setStep] = useState(0);
@@ -156,7 +260,7 @@ const GrammarVisualizer: React.FC<{ visual: GrammarVisual }> = ({ visual }) => {
 
 // --- Types for Grammar Slides ---
 type GrammarSlide = 
-  | { type: 'INTRO'; id: string; title: string; content: string }
+  | { type: 'INTRO'; id: string; title: string; content: TranslationSet }
   | { type: 'VISUAL'; id: string; title: string; data: GrammarVisual }
   | { type: 'EXAMPLE'; id: string; title: string; data: GrammarExample };
 
@@ -310,6 +414,11 @@ const LessonMode: React.FC = () => {
                       transition={{ type: "spring", stiffness: 200, damping: 20 }}
                       className="text-center max-w-5xl w-full"
                    >
+                      <TeacherAvatar 
+                          word={vocabItems[currentVocabIndex].word} 
+                          avatarUrl={vocabItems[currentVocabIndex].avatarUrl}
+                      />
+
                       <motion.h2 
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -326,14 +435,14 @@ const LessonMode: React.FC = () => {
                          className="h-2 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto mb-12"
                       />
                       
-                      <motion.p 
+                      <motion.div 
                         initial={{ y: 20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-2xl md:text-4xl text-slate-300 font-light leading-relaxed max-w-3xl mx-auto"
+                        className="text-2xl md:text-4xl text-slate-300 font-light leading-relaxed max-w-3xl mx-auto flex flex-col items-center"
                       >
-                         {vocabItems[currentVocabIndex].definition}
-                      </motion.p>
+                         <TranslateWrapper content={vocabItems[currentVocabIndex].definition} className="text-center items-center" />
+                      </motion.div>
                    </motion.div>
                  </AnimatePresence>
 
@@ -413,9 +522,10 @@ const LessonMode: React.FC = () => {
                                  </motion.h2>
                                  <div className="h-2 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto mb-12 w-[150px]" />
                                  <motion.div 
-                                    className="prose prose-invert prose-2xl mx-auto text-slate-300 font-light"
-                                    dangerouslySetInnerHTML={{ __html: slide.content }} 
-                                 />
+                                    className="prose prose-invert prose-2xl mx-auto text-slate-300 font-light flex flex-col items-center"
+                                 >
+                                     <TranslateWrapper content={slide.content} className="items-center" />
+                                 </motion.div>
                               </>
                            );
                         }
@@ -455,9 +565,12 @@ const LessonMode: React.FC = () => {
                                          <p className="text-2xl md:text-3xl text-white font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: slide.data.nominalized }} />
                                      </div>
                                  </div>
-                                 <p className="mt-8 text-slate-400 text-lg italic flex justify-center items-center gap-2">
-                                    <span className="not-italic text-2xl">💡</span> {slide.data.explanation}
-                                 </p>
+                                 <div className="mt-8 text-slate-400 text-lg italic flex justify-center items-center gap-2">
+                                    <span className="not-italic text-2xl">💡</span> 
+                                    <div className="flex-1 max-w-lg">
+                                        <TranslateWrapper content={slide.data.explanation} className="text-left not-italic" />
+                                    </div>
+                                 </div>
                               </>
                            );
                         }

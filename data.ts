@@ -8,7 +8,12 @@ export const readingData: ModuleData = {
   vocabSection: [
     {
       word: "Rampart",
-      definition: "A defensive wall of a castle or walled city.",
+      avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&h=400&auto=format&fit=crop",
+      definition: {
+        en: "A defensive wall of a castle or walled city.",
+        ru: "Крепостной вал или защитная стена замка/города.",
+        uz: "Qal'a yoki devor bilan o'ralgan shaharning mudofaa devori."
+      },
       speakingQuestions: [
         "Describe a historical place you have visited that had walls or ramparts.",
         "Do you think modern cities need defensive structures like ramparts?",
@@ -31,7 +36,12 @@ export const readingData: ModuleData = {
     },
     {
       word: "Inhospitable",
-      definition: "(of an environment) harsh and difficult to live in.",
+      avatarUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&h=400&auto=format&fit=crop",
+      definition: {
+        en: "(of an environment) harsh and difficult to live in.",
+        ru: "(о среде) суровый и непригодный для жизни.",
+        uz: "(muhit haqida) yashash uchun qiyin va noqulay."
+      },
       speakingQuestions: [
         "What is the most inhospitable place you can imagine visiting?",
         "How have humans adapted to live in inhospitable climates?",
@@ -54,7 +64,12 @@ export const readingData: ModuleData = {
     },
     {
       word: "Extinguish",
-      definition: "To cause to cease to exist; to wipe out completely.",
+      avatarUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&h=400&auto=format&fit=crop",
+      definition: {
+        en: "To cause to cease to exist; to wipe out completely.",
+        ru: "Уничтожить; полностью истребить; погасить.",
+        uz: "Mavjudligini yo'qotmoq; butunlay yo'q qilmoq; o'chirmoq."
+      },
       speakingQuestions: [
         "How do firefighters extinguish dangerous fires?",
         "What steps can we take to ensure endangered species are not extinguished?",
@@ -77,7 +92,12 @@ export const readingData: ModuleData = {
     },
     {
       word: "Commodification",
-      definition: "Treating something (like attention) as a product to be bought and sold.",
+      avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&h=400&auto=format&fit=crop",
+      definition: {
+        en: "Treating something (like attention) as a product to be bought and sold.",
+        ru: "Превращение чего-либо (например, внимания) в товар для купли-продажи.",
+        uz: "Biror narsaga (masalan, e'tiborga) sotiladigan va sotib olinadigan tovar sifatida qarash."
+      },
       speakingQuestions: [
         "What is your opinion on the commodification of personal data?",
         "Do you think the commodification of art ruins its artistic value?",
@@ -100,7 +120,12 @@ export const readingData: ModuleData = {
     },
     {
       word: "Irreversible",
-      definition: "Not possible to undo or alter.",
+      avatarUrl: "https://images.unsplash.com/photo-1598550874175-4d7112ee7f38?q=80&w=400&h=400&auto=format&fit=crop",
+      definition: {
+        en: "Not possible to undo or alter.",
+        ru: "Необратимый; невозможно изменить или отменить.",
+        uz: "Ortga qaytarib bo'lmaydigan; o'zgartirib bo'lmaydigan."
+      },
       speakingQuestions: [
         "What are some irreversible effects of climate change?",
         "Have you ever made a decision that was irreversible?",
@@ -124,7 +149,11 @@ export const readingData: ModuleData = {
   ],
   grammarSection: {
     topic: "Nominalization",
-    content: "Nominalization transforms actions (verbs) and descriptions (adjectives) into concepts (nouns). This creates the 'Academic Tone' required for high IELTS scores.",
+    content: {
+      en: "Nominalization transforms actions (verbs) and descriptions (adjectives) into concepts (nouns). This creates the 'Academic Tone' required for high IELTS scores.",
+      ru: "Номинализация преобразует действия (глаголы) и описания (прилагательные) в понятия (существительные). Это создает «академический тон», необходимый для высоких баллов IELTS.",
+      uz: "Nominalizatsiya harakatlarni (fe'llarni) va tavsiflarni (sifatlarni) tushunchalarga (otlarga) aylantiradi. Bu IELTS'da yuqori ball olish uchun talab qilinadigan 'Akademik ohang'ni yaratadi."
+    },
     visuals: [
       {
         title: "Verb to Noun Transformation",
@@ -145,17 +174,29 @@ export const readingData: ModuleData = {
       {
         original: "The population grew rapidly in the 19th century.",
         nominalized: "The rapid <strong>growth</strong> of the population in the 19th century caused overcrowding.",
-        explanation: "Action 'grew' becomes Concept 'growth'."
+        explanation: {
+          en: "Action 'grew' becomes Concept 'growth'.",
+          ru: "Действие 'grew' (росло) становится понятием 'growth' (рост).",
+          uz: "'Grew' (o'sdi) harakati 'growth' (o'sish) tushunchasiga aylanadi."
+        }
       },
       {
         original: "The chemicals reacted violently when mixed.",
         nominalized: "The violent <strong>reaction</strong> of the chemicals surprised the scientists.",
-        explanation: "Action 'reacted' becomes Concept 'reaction'."
+        explanation: {
+          en: "Action 'reacted' becomes Concept 'reaction'.",
+          ru: "Действие 'reacted' (реагировали) становится понятием 'reaction' (реакция).",
+          uz: "'Reacted' (reaksiyaga kirishdi) harakati 'reaction' (reaksiya) tushunchasiga aylanadi."
+        }
       },
       {
         original: "It is difficult to solve this complex problem.",
         nominalized: "The <strong>difficulty</strong> of solving this complex problem cannot be overstated.",
-        explanation: "Description 'difficult' becomes Concept 'difficulty'."
+        explanation: {
+          en: "Description 'difficult' becomes Concept 'difficulty'.",
+          ru: "Описание 'difficult' (трудный) становится понятием 'difficulty' (трудность).",
+          uz: "'Difficult' (qiyin) tavsifi 'difficulty' (qiyinchilik) tushunchasiga aylanadi."
+        }
       }
     ],
     quiz: [
@@ -230,35 +271,55 @@ export const readingData: ModuleData = {
             type: "TFNG", 
             text: "The ruins of Hattusa are currently marked by tall pillars and high walls that are still standing.", 
             correctAnswer: "FALSE",
-            explanation: "The passage states: 'No pillars or high walls mark the ruins... just stone foundations half-covered by dry grass.' This directly contradicts the statement that pillars and walls are still standing."
+            explanation: {
+              en: "The passage states: 'No pillars or high walls mark the ruins... just stone foundations half-covered by dry grass.' This directly contradicts the statement that pillars and walls are still standing.",
+              ru: "В отрывке сказано: «Никакие колонны или высокие стены не отмечают руины... только каменные фундаменты, наполовину покрытые сухой травой». Это прямо противоречит утверждению, что столбы и стены все еще стоят.",
+              uz: "Matnda aytilishicha: 'Xarobalarda ustunlar yoki baland devorlar yo'q ... faqat quruq o't bilan qoplangan tosh poydevorlar.' Bu ustunlar va devorlarning hamon tik turganligi haqidagi bayonotga mutlaqo zid."
+            }
           },
           { 
             id: 2, 
             type: "TFNG", 
             text: "The Hittite Empire was less powerful than the Egyptian and Babylonian empires during its peak.", 
             correctAnswer: "FALSE",
-            explanation: "Paragraph 2 states that the Hittite Empire 'rivaled ancient Egypt and Babylon.' 'Rivaled' means they were comparable in power, not less powerful."
+            explanation: {
+              en: "Paragraph 2 states that the Hittite Empire 'rivaled ancient Egypt and Babylon.' 'Rivaled' means they were comparable in power, not less powerful.",
+              ru: "В параграфе 2 говорится, что Хеттская империя «соперничала с древним Египтом и Вавилоном». «Соперничала» означает, что они были сопоставимы по силе, а не менее мощны.",
+              uz: "2-paragrafda Xet imperiyasi 'qadimgi Misr va Bobil bilan raqobatlashgani' aytiladi. 'Raqobatlashgan' degani ular kuch jihatidan kam bo'lmagan, balki teng bo'lganligini anglatadi."
+            }
           },
           { 
             id: 3, 
             type: "TFNG", 
             text: "The Battle of Kadesh led to the creation of the first known peace treaty in history.", 
             correctAnswer: "TRUE",
-            explanation: "Paragraph 2 explicitly states: 'their tangle with Egypt’s Pharaoh Ramses II at the Battle of Kadesh resulted in the world’s first recorded peace treaty.'"
+            explanation: {
+              en: "Paragraph 2 explicitly states: 'their tangle with Egypt’s Pharaoh Ramses II at the Battle of Kadesh resulted in the world’s first recorded peace treaty.'",
+              ru: "В параграфе 2 прямо сказано: «их столкновение с египетским фараоном Рамсесом II в битве при Кадеше привело к первому в мире записанному мирному договору».",
+              uz: "2-paragrafda aniq aytilgan: 'Qadesh jangida Misr fir'avni Ramses II bilan to'qnashuvi dunyodagi birinchi yozma tinchlik shartnomasiga olib keldi'."
+            }
           },
           { 
             id: 4, 
             type: "TFNG", 
             text: "Archaeological excavations in the early 20th century confirmed the location of the Hittite capital.", 
             correctAnswer: "TRUE",
-            explanation: "Paragraph 3 mentions: 'Digs in the early 1900s finally unearthed a trove... confirming suspicions that Hattusa was the lost Hittite capital.' Early 1900s corresponds to the early 20th century."
+            explanation: {
+              en: "Paragraph 3 mentions: 'Digs in the early 1900s finally unearthed a trove... confirming suspicions that Hattusa was the lost Hittite capital.' Early 1900s corresponds to the early 20th century.",
+              ru: "В параграфе 3 упоминается: «Раскопки в начале 1900-х годов наконец обнаружили клад... подтвердив подозрения, что Хаттуса была потерянной хеттской столицей». Начало 1900-х годов соответствует началу 20-го века.",
+              uz: "3-paragrafda aytilishicha: '1900-yillarning boshidagi qazishmalar xazinani ochdi... Xattusa yo'qolgan Xet poytaxti ekanligini tasdiqladi'. 1900-yillarning boshlari 20-asrning boshlariga to'g'ri keladi."
+            }
           },
           { 
             id: 5, 
             type: "TFNG", 
             text: "The Hittite capital was located in an area with a mild climate and consistent rainfall.", 
             correctAnswer: "FALSE",
-            explanation: "Paragraph 4 describes Hattusa as sitting in 'a land of extremes, with scorching summers and frigid winters' and notes the region's plains are 'bone-dry most of the year,' which contradicts 'mild climate and consistent rainfall'."
+            explanation: {
+              en: "Paragraph 4 describes Hattusa as sitting in 'a land of extremes, with scorching summers and frigid winters' and notes the region's plains are 'bone-dry most of the year,' which contradicts 'mild climate and consistent rainfall'.",
+              ru: "В параграфе 4 Хаттуса описывается как находящаяся в «земле крайностей, с палящим летом и ледяной зимой», и отмечается, что равнины региона «совершенно сухие большую часть года», что противоречит «мягкому климату и постоянным осадкам».",
+              uz: "4-paragrafda Xattusa 'yozda jazirama va qishda ayozli, keskin iqlimli yerda' joylashgani tasvirlangan va mintaqadagi tekisliklar 'yilning katta qismida quruq' ekanligi aytilgan, bu esa 'yumshoq iqlim va doimiy yog'ingarchilik'ka ziddir."
+            }
           },
           { 
             id: 6, 
@@ -266,7 +327,11 @@ export const readingData: ModuleData = {
             text: "For centuries, the Hittites were forgotten, unlike the ____ or Assyrians who remained in history books.", 
             limit: "ONE_WORD", 
             correctAnswer: "Egyptians",
-            explanation: "Paragraph 3 states: 'The Egyptians and Assyrians remained part of historical memory, but the Hittites were extinguished completely.' The gap requires the other civilization mentioned alongside Assyrians."
+            explanation: {
+              en: "Paragraph 3 states: 'The Egyptians and Assyrians remained part of historical memory, but the Hittites were extinguished completely.' The gap requires the other civilization mentioned alongside Assyrians.",
+              ru: "В параграфе 3 говорится: «Египтяне и ассирийцы остались частью исторической памяти, но хетты были полностью уничтожены». В пропуске требуется другая цивилизация, упомянутая наряду с ассирийцами.",
+              uz: "3-paragrafda aytilishicha: 'Misrliklar va Ossuriyaliklar tarixiy xotiraning bir qismi bo'lib qolishdi, ammo Xetlar butunlay yo'q bo'lib ketishdi'. Bo'sh joyga Ossuriyaliklar bilan birga tilga olingan boshqa sivilizatsiya kerak."
+            }
           },
           { 
             id: 7, 
@@ -274,7 +339,11 @@ export const readingData: ModuleData = {
             text: "Evidence of their existence was first found in carvings on Egyptian ____ and in diplomatic letters.", 
             limit: "ONE_WORD", 
             correctAnswer: "temples",
-            explanation: "Paragraph 3 mentions 'carvings at ancient Egyptian temples' as one of the sources that set off the hunt for the Hittites."
+            explanation: {
+              en: "Paragraph 3 mentions 'carvings at ancient Egyptian temples' as one of the sources that set off the hunt for the Hittites.",
+              ru: "В параграфе 3 упоминаются «резьба на древнеегипетских храмах» как один из источников, который начал поиски хеттов.",
+              uz: "3-paragrafda Xetlarni qidirishni boshlashga sabab bo'lgan manbalardan biri sifatida 'qadimgi Misr ibodatxonalaridagi o'yma naqshlar' tilga olingan."
+            }
           },
           { 
             id: 8, 
@@ -282,7 +351,11 @@ export const readingData: ModuleData = {
             text: "The confirmation of Hattusa as the capital came from the discovery of ____ tablets.", 
             limit: "ONE_WORD", 
             correctAnswer: "clay",
-            explanation: "Paragraph 3 concludes by saying digs unearthed a 'trove of clay cuneiform tablets confirming suspicions'."
+            explanation: {
+              en: "Paragraph 3 concludes by saying digs unearthed a 'trove of clay cuneiform tablets confirming suspicions'.",
+              ru: "Параграф 3 завершается тем, что раскопки обнаружили «клад глиняных клинописных табличек, подтверждающих подозрения».",
+              uz: "3-paragraf qazishmalar natijasida 'shubhalarni tasdiqlovchi sopol mixxat yozuvlari xazinasi' topilganligi bilan yakunlanadi."
+            }
           },
           { 
             id: 9, 
@@ -290,7 +363,11 @@ export const readingData: ModuleData = {
             text: "The city’s location was puzzling because the nearby plains were ____ for most of the year.", 
             limit: "ONE_WORD", 
             correctAnswer: "dry",
-            explanation: "Paragraph 4 states: 'the region's few plains are bone-dry most of the year.' The word 'dry' (or 'bone-dry') fits the gap."
+            explanation: {
+              en: "Paragraph 4 states: 'the region's few plains are bone-dry most of the year.' The word 'dry' (or 'bone-dry') fits the gap.",
+              ru: "В параграфе 4 говорится: «немногочисленные равнины региона совершенно сухие большую часть года». Слово «dry» (сухой) подходит для пропуска.",
+              uz: "4-paragrafda aytilishicha: 'mintaqaning kam sonli tekisliklari yilning ko'p qismida quruq bo'ladi'. 'Dry' (quruq) so'zi bo'sh joyga mos keladi."
+            }
           },
           { 
             id: 10, 
@@ -298,7 +375,11 @@ export const readingData: ModuleData = {
             text: "What animals did the Hittites herd to ensure they had food during crop failures?", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "sheep and goats",
-            explanation: "Paragraph 4 mentions they herded 'tens of thousands of sheep and goats to provide a reliable food source when crops failed'."
+            explanation: {
+              en: "Paragraph 4 mentions they herded 'tens of thousands of sheep and goats to provide a reliable food source when crops failed'.",
+              ru: "В параграфе 4 упоминается, что они пасли «десятки тысяч овец и коз, чтобы обеспечить надежный источник пищи при неурожае».",
+              uz: "4-paragrafda ular 'hosil bo'lmaganda ishonchli oziq-ovqat manbaini ta'minlash uchun o'n minglab qo'y va echkilarni' boqqanliklari aytiladi."
+            }
           },
           { 
             id: 11, 
@@ -306,7 +387,11 @@ export const readingData: ModuleData = {
             text: "Who were the northern raiders that constantly threatened the Hittite Empire?", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "The Kaska",
-            explanation: "Paragraph 5 identifies 'Raiders known as the Kaska were a constant threat from the north.'"
+            explanation: {
+              en: "Paragraph 5 identifies 'Raiders known as the Kaska were a constant threat from the north.'",
+              ru: "В параграфе 5 говорится: «Налетчики, известные как Каска, были постоянной угрозой с севера».",
+              uz: "5-paragrafda 'Kaska deb nomlanuvchi bosqinchilar shimoldan doimiy tahdid bo'lgan' deb ko'rsatilgan."
+            }
           },
           { 
             id: 12, 
@@ -314,7 +399,11 @@ export const readingData: ModuleData = {
             text: "Besides human conflict, what natural phenomenon frequently damaged the Hittite heartland?", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "earthquakes",
-            explanation: "Paragraph 5 lists natural disasters, specifically stating 'powerful earthquakes, regularly rocked the heartland'."
+            explanation: {
+              en: "Paragraph 5 lists natural disasters, specifically stating 'powerful earthquakes, regularly rocked the heartland'.",
+              ru: "В параграфе 5 перечисляются стихийные бедствия, в частности говорится: «мощные землетрясения регулярно сотрясали сердце страны».",
+              uz: "5-paragrafda tabiiy ofatlar sanab o'tiladi, xususan 'kuchli zilzilalar markaziy hududlarni muntazam larzaga keltirgani' aytiladi."
+            }
           },
           { 
             id: 13, 
@@ -322,7 +411,11 @@ export const readingData: ModuleData = {
             text: "What is the abandonment of Hattusa compared to, given that valuable items were removed?", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "emptied out slowly",
-            explanation: "Paragraph 5 states Hattusa 'appears to have been emptied out slowly... leaving only the heavy stone monuments behind'."
+            explanation: {
+              en: "Paragraph 5 states Hattusa 'appears to have been emptied out slowly... leaving only the heavy stone monuments behind'.",
+              ru: "В параграфе 5 говорится, что Хаттуса «похоже, медленно опустела... оставив после себя только тяжелые каменные памятники».",
+              uz: "5-paragrafda Xattusa 'sekin-asta bo'shab qolgandek... faqat og'ir tosh yodgorliklar qoldirilgan' deyiladi."
+            }
           }
         ]
       },
@@ -337,7 +430,11 @@ export const readingData: ModuleData = {
             target: "Paragraph A", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "vi",
-            explanation: "Heading vi (likely 'Attention as a product') matches Paragraph A, which discusses how users have become the product and attention is the 'financial bedrock' of companies."
+            explanation: {
+              en: "Heading vi (likely 'Attention as a product') matches Paragraph A, which discusses how users have become the product and attention is the 'financial bedrock' of companies.",
+              ru: "Заголовок vi («Внимание как продукт») соответствует параграфу A, в котором обсуждается, как пользователи стали продуктом, а внимание — «финансовой основой» компаний.",
+              uz: "vi sarlavhasi ('E'tibor mahsulot sifatida') A paragrafga mos keladi, unda foydalanuvchilar qanday qilib mahsulotga aylangani va e'tibor kompaniyalarning 'moliyaviy poydevori' ekanligi muhokama qilinadi."
+            }
           },
           { 
             id: 15, 
@@ -345,7 +442,11 @@ export const readingData: ModuleData = {
             target: "Paragraph B", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "v",
-            explanation: "Heading v (likely 'Psychological mechanisms') matches Paragraph B, which discusses 'persuasive design' and 'dopamine reward loops' used to capture attention."
+            explanation: {
+              en: "Heading v (likely 'Psychological mechanisms') matches Paragraph B, which discusses 'persuasive design' and 'dopamine reward loops' used to capture attention.",
+              ru: "Заголовок v («Психологические механизмы») соответствует параграфу B, где обсуждаются «убеждающий дизайн» и «дофаминовые петли вознаграждения», используемые для захвата внимания.",
+              uz: "v sarlavhasi ('Psixologik mexanizmlar') B paragrafga mos keladi, unda e'tiborni jalb qilish uchun ishlatiladigan 'ishontiruvchi dizayn' va 'dofamin mukofotlash halqalari' muhokama qilinadi."
+            }
           },
           { 
             id: 16, 
@@ -353,7 +454,11 @@ export const readingData: ModuleData = {
             target: "Paragraph C", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "i",
-            explanation: "Heading i (likely 'Economic externalities' or 'Costs of pollution') matches Paragraph C, which explicitly compares social media to a factory polluting a river and discusses 'externalities'."
+            explanation: {
+              en: "Heading i (likely 'Economic externalities' or 'Costs of pollution') matches Paragraph C, which explicitly compares social media to a factory polluting a river and discusses 'externalities'.",
+              ru: "Заголовок i («Экономические внешние эффекты» или «Издержки загрязнения») соответствует параграфу C, где социальные сети сравниваются с фабрикой, загрязняющей реку, и обсуждаются «внешние эффекты».",
+              uz: "i sarlavhasi ('Iqtisodiy tashqi ta'sirlar' yoki 'Ifloslanish xarajatlari') C paragrafga mos keladi, unda ijtimoiy tarmoqlar daryoni ifloslantiruvchi zavodga qiyoslanadi va 'tashqi ta'sirlar' muhokama qilinadi."
+            }
           },
           { 
             id: 17, 
@@ -361,7 +466,11 @@ export const readingData: ModuleData = {
             target: "Paragraph D", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "ii",
-            explanation: "Heading ii (likely 'Impact on politics') matches Paragraph D, which opens with 'The societal impact extends to the political sphere' and discusses polarization."
+            explanation: {
+              en: "Heading ii (likely 'Impact on politics') matches Paragraph D, which opens with 'The societal impact extends to the political sphere' and discusses polarization.",
+              ru: "Заголовок ii («Влияние на политику») соответствует параграфу D, который начинается со слов «Общественное влияние распространяется на политическую сферу» и обсуждает поляризацию.",
+              uz: "ii sarlavhasi ('Siyosatga ta'siri') D paragrafga mos keladi, u 'Ijtimoiy ta'sir siyosiy sohaga ham tarqaladi' degan so'zlar bilan boshlanadi va qutblanishni muhokama qiladi."
+            }
           },
           { 
             id: 18, 
@@ -369,7 +478,11 @@ export const readingData: ModuleData = {
             target: "Paragraph E", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "iv",
-            explanation: "Heading iv (likely 'Regulatory and business solutions') matches Paragraph E, which discusses the EU's Digital Services Act and subscription models."
+            explanation: {
+              en: "Heading iv (likely 'Regulatory and business solutions') matches Paragraph E, which discusses the EU's Digital Services Act and subscription models.",
+              ru: "Заголовок iv («Регуляторные и бизнес-решения») соответствует параграфу E, в котором обсуждаются Закон о цифровых услугах ЕС и модели подписки.",
+              uz: "iv sarlavhasi ('Tartibga solish va biznes yechimlari') E paragrafga mos keladi, unda YI ning Raqamli xizmatlar to'g'risidagi qonuni va obuna modellari muhokama qilinadi."
+            }
           },
           { 
             id: 19, 
@@ -377,7 +490,11 @@ export const readingData: ModuleData = {
             target: "Paragraph F", 
             options: ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii"], 
             correctAnswer: "viii",
-            explanation: "Heading viii (likely 'Personal responsibility') matches Paragraph F, which focuses on 'personal revolution', 'Digital minimalism', and controlling one's own attention."
+            explanation: {
+              en: "Heading viii (likely 'Personal responsibility') matches Paragraph F, which focuses on 'personal revolution', 'Digital minimalism', and controlling one's own attention.",
+              ru: "Заголовок viii («Личная ответственность») соответствует параграфу F, который фокусируется на «личной революции», «цифровом минимализме» и контроле собственного внимания.",
+              uz: "viii sarlavhasi ('Shaxsiy javobgarlik') F paragrafga mos keladi, unda 'shaxsiy inqilob', 'raqamli minimalizm' va o'z e'tiborini boshqarishga e'tibor qaratilgan."
+            }
           },
           { 
             id: 20, 
@@ -385,7 +502,11 @@ export const readingData: ModuleData = {
             text: "According to the writer, what is the primary product sold by major Silicon Valley companies?", 
             options: ["A. Advanced software and hardware", "B. User data and personal information", "C. The assurance of user attention", "D. Behavioral psychology research"], 
             correctAnswer: "C",
-            explanation: "Paragraph A states: 'The giants of Silicon Valley do not primarily sell software or devices; they sell the certainty that a user’s gaze will linger...'"
+            explanation: {
+              en: "Paragraph A states: 'The giants of Silicon Valley do not primarily sell software or devices; they sell the certainty that a user’s gaze will linger...'",
+              ru: "В параграфе A говорится: «Гиганты Кремниевой долины не продают в первую очередь программное обеспечение или устройства; они продают уверенность в том, что взгляд пользователя задержится...»",
+              uz: "A paragrafda aytilishicha: 'Silikon vodiysi gigantlari asosan dasturiy ta'minot yoki qurilmalarni sotmaydi; ular foydalanuvchi nigohi ma'lum vaqt davomida turishiga ishonchni sotadilar...'"
+            }
           },
           { 
             id: 21, 
@@ -393,7 +514,11 @@ export const readingData: ModuleData = {
             text: "Herbert Simon’s prediction in 1971 suggested that:", 
             options: ["A. Information would eventually become scarce.", "B. An abundance of information leads to a scarcity of attention.", "C. The value of attention would decrease over time.", "D. Behavioral psychology would dominate economics."], 
             correctAnswer: "B",
-            explanation: "Paragraph B quotes Simon: 'a wealth of information creates a poverty of attention.'"
+            explanation: {
+              en: "Paragraph B quotes Simon: 'a wealth of information creates a poverty of attention.'",
+              ru: "В параграфе B цитируется Саймон: «богатство информации создает бедность внимания».",
+              uz: "B paragrafda Saymonning so'zlari keltirilgan: 'axborotning ko'pligi e'tiborning yetishmasligini keltirib chiqaradi'."
+            }
           },
           { 
             id: 22, 
@@ -401,7 +526,11 @@ export const readingData: ModuleData = {
             text: "The term 'cognitive pollution' in the passage refers to:", 
             options: ["A. The physical waste produced by electronic devices.", "B. The negative side effects of social media on concentration and productivity.", "C. The spread of misinformation and fake news.", "D. The cost of advertising on digital platforms."], 
             correctAnswer: "B",
-            explanation: "Paragraph C defines the pollution as 'fragmented concentration, reduced productivity, and the erosion of deep reading skills'."
+            explanation: {
+              en: "Paragraph C defines the pollution as 'fragmented concentration, reduced productivity, and the erosion of deep reading skills'.",
+              ru: "Параграф C определяет загрязнение как «фрагментированную концентрацию, сниженную производительность и эрозию навыков глубокого чтения».",
+              uz: "C paragraf ifloslanishni 'bo'lingan konsentratsiya, pasaygan unumdorlik va chuqur o'qish ko'nikmalarining yemirilishi' sifatida ta'riflaydi."
+            }
           },
           { 
             id: 23, 
@@ -409,7 +538,11 @@ export const readingData: ModuleData = {
             text: "Why do algorithms often favor 'low-quality' attention?", 
             options: ["A. It creates deeper engagement with complex ideas.", "B. It is more difficult to harvest than high-quality attention.", "C. It leads to better political discourse.", "D. It is easier to capture and sell to advertisers."], 
             correctAnswer: "D",
-            explanation: "Paragraph C states: 'algorithms often favor the latter [low-quality attention], as it is easier to harvest and sell to advertisers.'"
+            explanation: {
+              en: "Paragraph C states: 'algorithms often favor the latter [low-quality attention], as it is easier to harvest and sell to advertisers.'",
+              ru: "В параграфе C говорится: «алгоритмы часто отдают предпочтение последнему [низкокачественному вниманию], так как его легче собрать и продать рекламодателям».",
+              uz: "C paragrafda aytilishicha: 'algoritmlar ko'pincha keyingisini [past sifatli e'tiborni] afzal ko'radi, chunki uni yig'ish va reklama beruvchilarga sotish osonroq'."
+            }
           },
           { 
             id: 24, 
@@ -417,7 +550,11 @@ export const readingData: ModuleData = {
             text: "A fundamental change in ____ models might be necessary.", 
             limit: "ONE_WORD", 
             correctAnswer: "business",
-            explanation: "Paragraph E states: 'structural change may require a rethink of the business models themselves.'"
+            explanation: {
+              en: "Paragraph E states: 'structural change may require a rethink of the business models themselves.'",
+              ru: "В параграфе E говорится: «структурные изменения могут потребовать переосмысления самих бизнес-моделей».",
+              uz: "E paragrafda aytilishicha: 'tizimli o'zgarishlar biznes modellarining o'zini qayta ko'rib chiqishni talab qilishi mumkin'."
+            }
           },
           { 
             id: 25, 
@@ -425,7 +562,11 @@ export const readingData: ModuleData = {
             text: "Moving towards ____ services, where users pay directly, could align company incentives with user interests.", 
             limit: "ONE_WORD", 
             correctAnswer: "subscription",
-            explanation: "Paragraph E mentions: 'shift towards subscription-based models, where the user pays the platform directly.'"
+            explanation: {
+              en: "Paragraph E mentions: 'shift towards subscription-based models, where the user pays the platform directly.'",
+              ru: "В параграфе E упоминается: «переход к моделям на основе подписки, где пользователь платит платформе напрямую».",
+              uz: "E paragrafda 'foydalanuvchi platformaga to'g'ridan-to'g'ri to'laydigan obunaga asoslangan modellarga o'tish' haqida so'z boradi."
+            }
           },
           { 
             id: 26, 
@@ -433,7 +574,11 @@ export const readingData: ModuleData = {
             text: "On a personal level, movements like 'digital minimalism' treat attention as a valuable ____ that must be protected.", 
             limit: "ONE_WORD", 
             correctAnswer: "asset",
-            explanation: "Paragraph F states: 'recognizing attention as a sovereign asset.'"
+            explanation: {
+              en: "Paragraph F states: 'recognizing attention as a sovereign asset.'",
+              ru: "В параграфе F говорится: «признание внимания суверенным активом».",
+              uz: "F paragrafda 'e'tiborni suveren aktiv sifatida tan olish' haqida aytiladi."
+            }
           }
         ]
       },
@@ -447,35 +592,55 @@ export const readingData: ModuleData = {
             type: "YES_NO_NOT_GIVEN", 
             text: "The collapse of warm-water coral reefs is a reversible process if temperatures drop immediately.", 
             correctAnswer: "NO", 
-            explanation: "Paragraph 1 defines a tipping point as causing 'often irreversible transformation'. Paragraph 2 states reefs are 'virtually certain to be lost on a meaningful scale' even at 1.5C. There is no mention of reversibility; the tone suggests permanence."
+            explanation: {
+              en: "Paragraph 1 defines a tipping point as causing 'often irreversible transformation'. Paragraph 2 states reefs are 'virtually certain to be lost on a meaningful scale' even at 1.5C. There is no mention of reversibility; the tone suggests permanence.",
+              ru: "Параграф 1 определяет переломный момент как вызывающий «часто необратимые трансформации». В параграфе 2 говорится, что рифы «практически наверняка будут потеряны в значительных масштабах» даже при 1,5°C. О возможности восстановления не упоминается; тон предполагает необратимость.",
+              uz: "1-paragrafda burilish nuqtasi 'ko'pincha ortga qaytarib bo'lmaydigan o'zgarish' sifatida ta'riflangan. 2-paragrafda aytilishicha, riflar hatto 1,5°C da ham 'katta miqyosda yo'qolishi deyarli aniq'. Qayta tiklanish haqida so'z yo'q; ohang doimiylikni anglatadi."
+            }
           },
           { 
             id: 28, 
             type: "YES_NO_NOT_GIVEN", 
             text: "The destruction of the Amazon rainforest would have a negligible effect on global carbon emissions.", 
             correctAnswer: "NO", 
-            explanation: "Paragraph 3 explicitly states: 'This shift would release massive amounts of stored carbon, further accelerating global heating.' 'Massive amounts' contradicts 'negligible effect'."
+            explanation: {
+              en: "Paragraph 3 explicitly states: 'This shift would release massive amounts of stored carbon, further accelerating global heating.' 'Massive amounts' contradicts 'negligible effect'.",
+              ru: "В параграфе 3 прямо говорится: «Этот сдвиг высвободит огромное количество накопленного углерода, еще больше ускорив глобальное потепление». «Огромное количество» противоречит «незначительному эффекту».",
+              uz: "3-paragrafda aniq aytilgan: 'Bu o'zgarish katta miqdordagi to'plangan uglerodni chiqarib yuboradi va global isishni yanada tezlashtiradi'. 'Katta miqdor' 'arzimas ta'sir'ga ziddir."
+            }
           },
           { 
             id: 29, 
             type: "YES_NO_NOT_GIVEN", 
             text: "The collapse of the AMOC would lead to milder winters in Europe.", 
             correctAnswer: "NO", 
-            explanation: "Paragraph 4 states: 'A collapse would result in much harsher winters in north-west Europe'. 'Harsher' contradicts 'milder'."
+            explanation: {
+              en: "Paragraph 4 states: 'A collapse would result in much harsher winters in north-west Europe'. 'Harsher' contradicts 'milder'.",
+              ru: "В параграфе 4 говорится: «Коллапс приведет к гораздо более суровым зимам в северо-западной Европе». «Более суровые» противоречит «более мягким».",
+              uz: "4-paragrafda aytilishicha: 'Hlokat Shimoliy-G'arbiy Yevropada qishning ancha qattiq kelishiga olib keladi'. 'Qattiq' so'zi 'yumshoq' so'ziga ziddir."
+            }
           },
           { 
             id: 30, 
             type: "YES_NO_NOT_GIVEN", 
             text: "Current government policies adequately address the risks posed by non-linear climate tipping points.", 
             correctAnswer: "NO", 
-            explanation: "Paragraph 5 states: 'current policy thinking rarely accounts for these non-linear threats.' This means they do NOT adequately address them."
+            explanation: {
+              en: "Paragraph 5 states: 'current policy thinking rarely accounts for these non-linear threats.' This means they do NOT adequately address them.",
+              ru: "В параграфе 5 говорится: «нынешнее политическое мышление редко учитывает эти нелинейные угрозы». Это означает, что они НЕ реагируют на них должным образом.",
+              uz: "5-paragrafda aytilishicha: 'hozirgi siyosiy qarashlar ushbu chiziqli bo'lmagan tahdidlarni kamdan-kam hisobga oladi'. Bu ular yetarli darajada e'tibor bermayotganini anglatadi."
+            }
           },
           { 
             id: 31, 
             type: "YES_NO_NOT_GIVEN", 
             text: "The adoption of solar power is an example of a positive tipping point that has already occurred in some markets.", 
             correctAnswer: "YES", 
-            explanation: "Paragraph 6 states: 'positive tipping points have already been crossed in the adoption of solar power... in leading markets.'"
+            explanation: {
+              en: "Paragraph 6 states: 'positive tipping points have already been crossed in the adoption of solar power... in leading markets.'",
+              ru: "В параграфе 6 говорится: «положительные переломные моменты уже пройдены во внедрении солнечной энергии... на ведущих рынках».",
+              uz: "6-paragrafda aytilishicha: 'quyosh energiyasini qabul qilishda ijobiy burilish nuqtalari allaqachon bosib o'tilgan... yetakchi bozorlarda'."
+            }
           },
           { 
             id: 32, 
@@ -483,7 +648,11 @@ export const readingData: ModuleData = {
             text: "A tipping point is defined as a moment when a ____ causes a system to shift into a new state.", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "small change",
-            explanation: "Paragraph 1 states: 'A tipping point occurs when a small change tips a system into a new state'."
+            explanation: {
+              en: "Paragraph 1 states: 'A tipping point occurs when a small change tips a system into a new state'.",
+              ru: "В параграфе 1 говорится: «Переломный момент наступает, когда небольшое изменение переводит систему в новое состояние».",
+              uz: "1-paragrafda aytilishicha: 'Burilish nuqtasi kichik o'zgarish tizimni yangi holatga o'tkazganda yuz beradi'."
+            }
           },
           { 
             id: 33, 
@@ -491,7 +660,11 @@ export const readingData: ModuleData = {
             text: "The Amazon rainforest is in danger of turning into a ____, which would release stored carbon.", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "dry savanna",
-            explanation: "Paragraph 3 mentions the risk of the Amazon 'transforming from a lush rainforest into a dry savanna'."
+            explanation: {
+              en: "Paragraph 3 mentions the risk of the Amazon 'transforming from a lush rainforest into a dry savanna'.",
+              ru: "В параграфе 3 упоминается риск превращения Амазонки «из пышного тропического леса в сухую саванну».",
+              uz: "3-paragrafda Amazonkaning 'serhosil yomg'irli o'rmondan quruq savannaga aylanishi' xavfi haqida so'z boradi."
+            }
           },
           { 
             id: 34, 
@@ -499,7 +672,11 @@ export const readingData: ModuleData = {
             text: "The ____ is a system of currents responsible for regulating the Northern Hemisphere's climate.", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "AMOC",
-            explanation: "Paragraph 4 describes the 'AMOC' (Atlantic Meridional Overturning Circulation) and says 'This process is crucial for regulating the climate of the Northern Hemisphere'."
+            explanation: {
+              en: "Paragraph 4 describes the 'AMOC' (Atlantic Meridional Overturning Circulation) and says 'This process is crucial for regulating the climate of the Northern Hemisphere'.",
+              ru: "В параграфе 4 описывается «AMOC» (Атлантическая меридиональная опрокидывающая циркуляция) и говорится: «Этот процесс имеет решающее значение для регулирования климата Северного полушария».",
+              uz: "4-paragrafda 'AMOC' tasvirlangan va 'Bu jarayon Shimoliy yarim shar iqlimini tartibga solish uchun juda muhim' deyilgan."
+            }
           },
           { 
             id: 35, 
@@ -507,7 +684,11 @@ export const readingData: ModuleData = {
             text: "To prevent tipping points, Dr. Milkoreit suggests ____ pathways that involve immediate, drastic emission cuts.", 
             limit: "NO_MORE_THAN_TWO_WORDS", 
             correctAnswer: "frontloaded",
-            explanation: "Paragraph 5 quotes Dr. Milkoreit: 'Preventing them requires frontloaded mitigation pathways'."
+            explanation: {
+              en: "Paragraph 5 quotes Dr. Milkoreit: 'Preventing them requires frontloaded mitigation pathways'.",
+              ru: "В параграфе 5 цитируется д-р Милкорейт: «Предотвращение требует предварительных (frontloaded) путей смягчения последствий».",
+              uz: "5-paragrafda doktor Milkoreytning so'zlari keltirilgan: 'Ularning oldini olish oldindan yuklangan (frontloaded) yumshatish yo'llarini talab qiladi'."
+            }
           },
           { 
             id: 36, 
@@ -515,7 +696,11 @@ export const readingData: ModuleData = {
             text: "The new technology becomes ____ and better than the old polluting one.", 
             limit: "ONE_WORD", 
             correctAnswer: "cheaper",
-            explanation: "Paragraph 6 explains positive tipping points happen when 'new technology becomes cheaper and better'."
+            explanation: {
+              en: "Paragraph 6 explains positive tipping points happen when 'new technology becomes cheaper and better'.",
+              ru: "Параграф 6 объясняет, что положительные переломные моменты наступают, когда «новая технология становится дешевле и лучше».",
+              uz: "6-paragrafda ijobiy burilish nuqtalari 'yangi texnologiya arzonroq va yaxshiroq bo'lganda' sodir bo'lishi tushuntiriladi."
+            }
           },
           { 
             id: 37, 
@@ -523,7 +708,11 @@ export const readingData: ModuleData = {
             text: "Rapid mass ____ occurs as the market 'tips' toward the new product.", 
             limit: "ONE_WORD", 
             correctAnswer: "adoption",
-            explanation: "Paragraph 6 states: 'a rapid mass adoption occurs'."
+            explanation: {
+              en: "Paragraph 6 states: 'a rapid mass adoption occurs'.",
+              ru: "В параграфе 6 говорится: «происходит быстрое массовое принятие (adoption)».",
+              uz: "6-paragrafda aytilishicha: 'tezkor ommaviy qabul qilish (adoption) sodir bo'ladi'."
+            }
           },
           { 
             id: 38, 
@@ -531,7 +720,11 @@ export const readingData: ModuleData = {
             text: "Policy action at 'super-leverage points' triggers ____ across other sectors.", 
             limit: "ONE_WORD", 
             correctAnswer: "cascades",
-            explanation: "Paragraph 6 argues that action at super-leverage points 'can unleash these cascades across sectors'."
+            explanation: {
+              en: "Paragraph 6 argues that action at super-leverage points 'can unleash these cascades across sectors'.",
+              ru: "В параграфе 6 утверждается, что действия в точках супер-рычагов «могут вызвать эти каскады (cascades) в других секторах».",
+              uz: "6-paragrafda aytilishicha, o'ta kuchli ta'sir nuqtalaridagi harakatlar 'boshqa sohalarda ushbu kaskadlarni (cascades) keltirib chiqarishi mumkin'."
+            }
           },
           { 
             id: 39, 
@@ -539,7 +732,11 @@ export const readingData: ModuleData = {
             text: "Decarbonizing power helps decarbonize ____ and heating.", 
             limit: "ONE_WORD", 
             correctAnswer: "transport",
-            explanation: "Paragraph 6 gives an example: 'decarbonization of the power sector accelerates the decarbonization of transport'."
+            explanation: {
+              en: "Paragraph 6 gives an example: 'decarbonization of the power sector accelerates the decarbonization of transport'.",
+              ru: "В параграфе 6 приводится пример: «декарбонизация энергетического сектора ускоряет декарбонизацию транспорта».",
+              uz: "6-paragrafda misol keltirilgan: 'energetika sektorini dekarbonizatsiya qilish transportni dekarbonizatsiya qilishni tezlashtiradi'."
+            }
           },
           { 
             id: 40, 
@@ -547,7 +744,11 @@ export const readingData: ModuleData = {
             text: "The world moves away from ____ outcomes toward a sustainable future.", 
             limit: "ONE_WORD", 
             correctAnswer: "catastrophic",
-            explanation: "Paragraph 7 concludes with the goal to 'tip the world away from catastrophic outcomes'."
+            explanation: {
+              en: "Paragraph 7 concludes with the goal to 'tip the world away from catastrophic outcomes'.",
+              ru: "Параграф 7 завершается целью «увести мир от катастрофических (catastrophic) последствий».",
+              uz: "7-paragraf 'dunyoni halokatli (catastrophic) oqibatlardan uzoqlashtirish' maqsadi bilan yakunlanadi."
+            }
           }
         ]
       }
