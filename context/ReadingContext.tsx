@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { readingData } from '../data';
+import { readingModules } from '../data';
 import { ModuleData, Passage, Question } from '../types';
 
 interface ReadingContextType {
+  activeModuleId: string;
   moduleData: ModuleData;
   currentPassageIndex: number;
   userAnswers: Record<number, string>;
@@ -13,6 +14,7 @@ interface ReadingContextType {
   totalPassages: number;
   allQuestions: Question[];
   // Actions
+  switchModule: (moduleId: string) => void;
   startTest: () => void;
   setAnswer: (questionId: number, value: string) => void;
   nextPassage: () => void;
@@ -25,15 +27,20 @@ interface ReadingContextType {
 const ReadingContext = createContext<ReadingContextType | undefined>(undefined);
 
 export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [activeModuleId, setActiveModuleId] = useState<string>('vol1');
   const [currentPassageIndex, setCurrentPassageIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
-  const [timeLeft, setTimeLeft] = useState(readingData.testData.timerSeconds);
+  
+  // Initialize module data based on active ID
+  const moduleData = readingModules[activeModuleId] || readingModules['vol1'];
+  
+  const [timeLeft, setTimeLeft] = useState(moduleData.testData.timerSeconds);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const currentPassage = readingData.testData.passages[currentPassageIndex];
-  const totalPassages = readingData.testData.passages.length;
-  const allQuestions = readingData.testData.passages.flatMap(p => p.questions);
+  const currentPassage = moduleData.testData.passages[currentPassageIndex];
+  const totalPassages = moduleData.testData.passages.length;
+  const allQuestions = moduleData.testData.passages.flatMap(p => p.questions);
 
   // Timer Tick Effect
   useEffect(() => {
@@ -57,11 +64,23 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isTimerActive, isSubmitted]);
 
+  const switchModule = (moduleId: string) => {
+    if (readingModules[moduleId]) {
+      setActiveModuleId(moduleId);
+      // Reset state on switch
+      setIsTimerActive(false);
+      setIsSubmitted(false);
+      setUserAnswers({});
+      setCurrentPassageIndex(0);
+      setTimeLeft(readingModules[moduleId].testData.timerSeconds);
+    }
+  };
+
   const startTest = () => {
     setIsTimerActive(true);
     setIsSubmitted(false);
     setUserAnswers({});
-    setTimeLeft(readingData.testData.timerSeconds);
+    setTimeLeft(moduleData.testData.timerSeconds);
     setCurrentPassageIndex(0);
   };
 
@@ -96,7 +115,7 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children })
   const resetTest = () => {
       setIsTimerActive(false);
       setIsSubmitted(false);
-      setTimeLeft(readingData.testData.timerSeconds);
+      setTimeLeft(moduleData.testData.timerSeconds);
       setCurrentPassageIndex(0);
       setUserAnswers({});
   }
@@ -104,7 +123,8 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children })
   return (
     <ReadingContext.Provider
       value={{
-        moduleData: readingData,
+        activeModuleId,
+        moduleData,
         currentPassageIndex,
         userAnswers,
         timeLeft,
@@ -113,6 +133,7 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children })
         currentPassage,
         totalPassages,
         allQuestions,
+        switchModule,
         startTest,
         setAnswer,
         nextPassage,

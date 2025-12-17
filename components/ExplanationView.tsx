@@ -13,16 +13,16 @@ const TranslateWrapper: React.FC<{ content: TranslationSet; className?: string }
         <div className={`flex flex-col ${className}`}>
             <div className="text-slate-300 leading-8 text-lg" dangerouslySetInnerHTML={{ __html: content.en }} />
             
-            <div className="flex gap-2 mt-3 select-none">
+            <div className="flex gap-2 mt-4 select-none">
                 <button 
                     onClick={() => setLang(lang === 'ru' ? null : 'ru')}
-                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'ru' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${lang === 'ru' ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-white hover:border-slate-500'}`}
                 >
                     Ru
                 </button>
                 <button 
                     onClick={() => setLang(lang === 'uz' ? null : 'uz')}
-                    className={`px-2 py-1 rounded text-xs font-bold uppercase transition-colors ${lang === 'uz' ? 'bg-emerald-600 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${lang === 'uz' ? 'bg-emerald-600 border-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700 hover:text-white hover:border-slate-500'}`}
                 >
                     Uz
                 </button>
@@ -36,7 +36,8 @@ const TranslateWrapper: React.FC<{ content: TranslationSet; className?: string }
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className={`mt-2 p-3 rounded-lg text-sm border-l-2 leading-relaxed ${lang === 'ru' ? 'bg-blue-900/20 border-blue-500 text-blue-200' : 'bg-emerald-900/20 border-emerald-500 text-emerald-200'}`}>
+                        <div className={`mt-3 p-4 rounded-xl text-sm border-l-4 leading-relaxed shadow-inner ${lang === 'ru' ? 'bg-blue-900/30 border-blue-500 text-blue-100' : 'bg-emerald-900/30 border-emerald-500 text-emerald-100'}`}>
+                            <span className="block text-[10px] uppercase font-bold opacity-50 mb-1">{lang === 'ru' ? 'Russian' : 'Uzbek'} Translation</span>
                             {lang === 'ru' ? content.ru : content.uz}
                         </div>
                     </motion.div>

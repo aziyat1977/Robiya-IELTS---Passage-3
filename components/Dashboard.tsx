@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Laptop, ChevronRight, PlayCircle, Layers, Box } from 'lucide-react';
+import { BookOpen, GraduationCap, Laptop, ChevronRight, PlayCircle, Layers, Box, Globe, Archive } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
@@ -81,7 +81,7 @@ const TiltCard = ({ children, to, gradient }: any) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { moduleData, isTimerActive } = useReading();
+  const { moduleData, isTimerActive, activeModuleId, switchModule } = useReading();
 
   return (
     <motion.div 
@@ -96,14 +96,34 @@ const Dashboard: React.FC = () => {
       <FloatingShape color="#ec4899" x="30%" y="70%" size="350px" delay={4} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
+        
+        {/* Module Switcher */}
+        <div className="flex justify-center mb-12">
+            <div className="bg-white/10 backdrop-blur-md p-1 rounded-full border border-white/10 flex">
+                <button 
+                    onClick={() => switchModule('vol1')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all ${activeModuleId === 'vol1' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                >
+                    Volume 01
+                </button>
+                <button 
+                     onClick={() => switchModule('vol2')}
+                     className={`px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all ${activeModuleId === 'vol2' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                >
+                    Volume 02
+                </button>
+            </div>
+        </div>
+
         <header className="mb-20 text-center">
           <motion.div
-            initial={{ y: -50, opacity: 0 }}
+            key={activeModuleId} // Re-animate on switch
+            initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 100 }}
             className="inline-block"
           >
-            <h1 className="text-6xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-4 drop-shadow-lg tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-4 drop-shadow-lg tracking-tight">
               {moduleData.title}
             </h1>
           </motion.div>
@@ -115,7 +135,7 @@ const Dashboard: React.FC = () => {
              className="flex justify-center gap-2 mb-6"
           >
             <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/50 text-blue-200 text-xs font-mono uppercase tracking-widest">
-              Volume 01
+              {activeModuleId === 'vol1' ? 'Volume 01' : 'Volume 02'}
             </span>
             <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/50 text-purple-200 text-xs font-mono uppercase tracking-widest">
               Academic
@@ -123,6 +143,7 @@ const Dashboard: React.FC = () => {
           </motion.div>
 
           <motion.p 
+            key={moduleData.subtitle}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -147,7 +168,7 @@ const Dashboard: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold mb-3 text-white">Vocabulary Core</h3>
               <p className="text-blue-200 flex-grow">
-                Master {moduleData.vocabSection.length} high-frequency academic terms.
+                Master {moduleData.vocabSection.length} high-frequency academic terms found in this volume.
               </p>
               <div className="mt-6 flex items-center text-cyan-300 font-bold tracking-wide group-hover:translate-x-2 transition-transform">
                 INITIATE <ChevronRight className="w-5 h-5 ml-2" />
