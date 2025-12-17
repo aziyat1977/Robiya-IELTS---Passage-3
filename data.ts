@@ -1,5 +1,8 @@
 import { ModuleData } from './types';
 
+// Consistent Teacher Avatar URL (Professional Female)
+const TEACHER_AVATAR_URL = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&h=400&auto=format&fit=crop";
+
 export const readingData: ModuleData = {
   id: "read_vol_1",
   title: "IELTS Academic Reading Vol. 1",
@@ -8,7 +11,7 @@ export const readingData: ModuleData = {
   vocabSection: [
     {
       word: "Rampart",
-      avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&h=400&auto=format&fit=crop",
+      avatarUrl: TEACHER_AVATAR_URL,
       definition: {
         en: "A defensive wall of a castle or walled city.",
         ru: "Крепостной вал или защитная стена замка/города.",
@@ -36,7 +39,7 @@ export const readingData: ModuleData = {
     },
     {
       word: "Inhospitable",
-      avatarUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&h=400&auto=format&fit=crop",
+      avatarUrl: TEACHER_AVATAR_URL,
       definition: {
         en: "(of an environment) harsh and difficult to live in.",
         ru: "(о среде) суровый и непригодный для жизни.",
@@ -64,7 +67,7 @@ export const readingData: ModuleData = {
     },
     {
       word: "Extinguish",
-      avatarUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&h=400&auto=format&fit=crop",
+      avatarUrl: TEACHER_AVATAR_URL,
       definition: {
         en: "To cause to cease to exist; to wipe out completely.",
         ru: "Уничтожить; полностью истребить; погасить.",
@@ -92,7 +95,7 @@ export const readingData: ModuleData = {
     },
     {
       word: "Commodification",
-      avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&h=400&auto=format&fit=crop",
+      avatarUrl: TEACHER_AVATAR_URL,
       definition: {
         en: "Treating something (like attention) as a product to be bought and sold.",
         ru: "Превращение чего-либо (например, внимания) в товар для купли-продажи.",
@@ -120,7 +123,7 @@ export const readingData: ModuleData = {
     },
     {
       word: "Irreversible",
-      avatarUrl: "https://images.unsplash.com/photo-1598550874175-4d7112ee7f38?q=80&w=400&h=400&auto=format&fit=crop",
+      avatarUrl: TEACHER_AVATAR_URL,
       definition: {
         en: "Not possible to undo or alter.",
         ru: "Необратимый; невозможно изменить или отменить.",
@@ -366,7 +369,7 @@ export const readingData: ModuleData = {
             explanation: {
               en: "Paragraph 4 states: 'the region's few plains are bone-dry most of the year.' The word 'dry' (or 'bone-dry') fits the gap.",
               ru: "В параграфе 4 говорится: «немногочисленные равнины региона совершенно сухие большую часть года». Слово «dry» (сухой) подходит для пропуска.",
-              uz: "4-paragrafda aytilishicha: 'mintaqaning kam sonli tekisliklari yilning ko'p qismida quruq bo'ladi'. 'Dry' (quruq) so'zi bo'sh joyga mos keladi."
+              uz: "4-paragrafda aytilishicha: 'mintaqaning kam sonli tekisliklari yilning ko'p qismida quruq' bo'ladi. 'Dry' (quruq) so'zi bo'sh joyga mos keladi."
             }
           },
           { 

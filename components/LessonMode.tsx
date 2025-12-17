@@ -13,14 +13,54 @@ const shuffle = <T,>(array: T[]): T[] => {
 // --- Component: Teacher Avatar & Pronunciation ---
 const TeacherAvatar: React.FC<{ word: string; avatarUrl: string }> = ({ word, avatarUrl }) => {
     const [speaking, setSpeaking] = useState(false);
+    const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
+
+    // Initialize voices and select a female British voice if possible
+    useEffect(() => {
+        const loadVoices = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                // Priority 1: Google UK English Female
+                let selected = voices.find(v => v.name === 'Google UK English Female');
+                
+                // Priority 2: Microsoft Zira (US Female, but often standard) or Samantha
+                if (!selected) selected = voices.find(v => v.name.includes('Zira') || v.name.includes('Samantha'));
+                
+                // Priority 3: Any 'female' voice in English
+                if (!selected) selected = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'));
+                
+                // Priority 4: Default en-GB
+                if (!selected) selected = voices.find(v => v.lang === 'en-GB');
+
+                // Fallback: First English voice
+                if (!selected) selected = voices.find(v => v.lang.startsWith('en'));
+
+                setVoice(selected || null);
+            }
+        };
+
+        loadVoices();
+        
+        // Chrome loads voices asynchronously
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    }, []);
 
     const speak = () => {
         if (!window.speechSynthesis) return;
         setSpeaking(true);
         const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-GB'; // IELTS Standard
+        
+        if (voice) {
+            utterance.voice = voice;
+        } else {
+            // Fallback attributes if no specific voice object found
+            utterance.lang = 'en-GB'; 
+        }
+
         utterance.rate = 0.8; // Slightly slower for clarity
-        utterance.pitch = 1;
+        utterance.pitch = 1.05; // Slightly higher pitch often sounds more feminine if generic voice is used
         
         utterance.onend = () => setSpeaking(false);
         window.speechSynthesis.speak(utterance);
