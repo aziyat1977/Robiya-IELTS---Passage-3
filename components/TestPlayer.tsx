@@ -1,8 +1,33 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useReading } from '../context/ReadingContext';
-import { Clock, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Clock, ChevronLeft, ChevronRight, AlertCircle, BookOpen, HelpCircle, Save } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// --- 3D Button Component ---
+const ActionButton = ({ onClick, children, disabled, variant = 'primary', className = '' }: any) => {
+  const variants = {
+    primary: "bg-blue-600 border-blue-800 text-white shadow-[0_4px_0_rgb(30,64,175)] hover:shadow-[0_2px_0_rgb(30,64,175)] hover:translate-y-[2px]",
+    secondary: "bg-slate-700 border-slate-900 text-slate-200 shadow-[0_4px_0_rgb(15,23,42)] hover:shadow-[0_2px_0_rgb(15,23,42)] hover:translate-y-[2px]",
+    danger: "bg-rose-600 border-rose-800 text-white shadow-[0_4px_0_rgb(159,18,57)] hover:shadow-[0_2px_0_rgb(159,18,57)] hover:translate-y-[2px]",
+  };
+
+  return (
+    <motion.button
+      whileTap={{ y: 4, boxShadow: "0 0px 0 rgb(0,0,0)" }}
+      disabled={disabled}
+      onClick={onClick}
+      className={`
+        relative px-4 py-2 rounded-lg font-bold uppercase tracking-wider text-sm transition-all border-b-4
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-1 disabled:border-b-0
+        ${variants[variant as keyof typeof variants]}
+        ${className}
+      `}
+    >
+      {children}
+    </motion.button>
+  );
+};
 
 const TestPlayer: React.FC = () => {
   const {
@@ -26,22 +51,35 @@ const TestPlayer: React.FC = () => {
   const navigate = useNavigate();
   const leftPaneRef = useRef<HTMLDivElement>(null);
   const rightPaneRef = useRef<HTMLDivElement>(null);
+  const [mobileTab, setMobileTab] = useState<'passage' | 'questions'>('passage');
+  const [scrollTargetQuestionId, setScrollTargetQuestionId] = useState<number | null>(null);
 
-  // Initialize test on mount
   useEffect(() => {
     if (!isTimerActive && !isSubmitted) {
       startTest();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reset scroll position when passage changes
   useEffect(() => {
-    if (leftPaneRef.current) leftPaneRef.current.scrollTop = 0;
-    if (rightPaneRef.current) rightPaneRef.current.scrollTop = 0;
-  }, [currentPassageIndex]);
+    if (scrollTargetQuestionId !== null) {
+      setTimeout(() => {
+        const element = document.getElementById(`question-${scrollTargetQuestionId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setMobileTab('questions');
+        }
+        setScrollTargetQuestionId(null);
+      }, 150);
+    }
+  }, [scrollTargetQuestionId, currentPassageIndex]);
 
-  // Format Timer
+  useEffect(() => {
+    if (!scrollTargetQuestionId) {
+      if (leftPaneRef.current) leftPaneRef.current.scrollTop = 0;
+      if (rightPaneRef.current) rightPaneRef.current.scrollTop = 0;
+    }
+  }, [currentPassageIndex, scrollTargetQuestionId]);
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -49,196 +87,210 @@ const TestPlayer: React.FC = () => {
   };
 
   const handleFinish = () => {
-    if (window.confirm("Are you sure you want to submit your test?")) {
+    if (window.confirm("Abort simulation and submit results?")) {
       submitTest();
       navigate('/reading/results');
     }
   };
 
-  // If we are finished but landed back here, go to results
   useEffect(() => {
-      if(isSubmitted) {
-          navigate('/reading/results');
-      }
+      if(isSubmitted) navigate('/reading/results');
   }, [isSubmitted, navigate]);
 
-  const getPassageIndexForQuestion = (qId: number) => {
-    return moduleData.testData.passages.findIndex(p => p.questions.some(q => q.id === qId));
+  const handlePaletteClick = (qId: number) => {
+    const targetPassageIndex = moduleData.testData.passages.findIndex(p => p.questions.some(q => q.id === qId));
+    if (targetPassageIndex !== -1) {
+      setPassage(targetPassageIndex);
+      setScrollTargetQuestionId(qId);
+    }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 font-sans overflow-hidden">
-      {/* HEADER */}
-      <header className="h-16 bg-white border-b border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-sm">
-        <motion.div 
-            key={timeLeft < 300 ? 'urgent' : 'normal'}
-            initial={{ scale: 1 }}
-            animate={timeLeft < 300 ? { scale: [1, 1.1, 1], opacity: [1, 0.8, 1] } : {}}
-            transition={timeLeft < 300 ? { repeat: Infinity, duration: 1 } : {}}
-            className={`text-xl font-bold font-mono flex items-center gap-2 ${timeLeft < 300 ? 'text-red-600' : 'text-gray-800'}`}
-        >
-          <Clock className="w-5 h-5" />
-          {formatTime(timeLeft)}
-        </motion.div>
-        
-        <div className="text-gray-900 font-semibold truncate max-w-xl hidden md:block">
-            <AnimatePresence mode="wait">
-                <motion.span
-                    key={currentPassage.title}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    {currentPassage.title}
-                </motion.span>
-            </AnimatePresence>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex flex-col h-screen bg-[#0f172a] text-slate-200 font-sans overflow-hidden"
+    >
+      {/* 3D HEADER */}
+      <header className="h-20 flex-shrink-0 z-30 px-6 flex items-center justify-between bg-[#1e293b]/80 backdrop-blur-md border-b border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center gap-6">
+          <div className="relative group">
+            <div className={`absolute inset-0 rounded-lg blur opacity-40 ${timeLeft < 300 ? 'bg-red-600 animate-pulse' : 'bg-blue-600'}`}></div>
+            <div className={`relative px-4 py-2 bg-slate-900 border ${timeLeft < 300 ? 'border-red-500/50' : 'border-blue-500/50'} rounded-lg flex items-center gap-3 shadow-inner`}>
+              <Clock className={`w-5 h-5 ${timeLeft < 300 ? 'text-red-400' : 'text-blue-400'}`} />
+              <span className={`font-mono text-xl font-bold tracking-widest ${timeLeft < 300 ? 'text-red-400' : 'text-blue-100'}`}>
+                {formatTime(timeLeft)}
+              </span>
+            </div>
+          </div>
+          
+          <div className="hidden md:flex flex-col">
+            <span className="text-xs text-slate-400 uppercase tracking-widest">Active Simulation</span>
+            <span className="text-sm font-semibold text-white truncate max-w-xs">{currentPassage.title}</span>
+          </div>
+
+           {/* Mobile Tab Toggles */}
+           <div className="flex md:hidden bg-slate-800 rounded-lg p-1">
+            <button 
+              onClick={() => setMobileTab('passage')}
+              className={`p-2 rounded-md transition-colors ${mobileTab === 'passage' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}
+            >
+              <BookOpen className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setMobileTab('questions')}
+              className={`p-2 rounded-md transition-colors ${mobileTab === 'questions' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'}`}
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-        
-        <div>
-          <button 
-            onClick={handleFinish}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors shadow-sm"
-          >
-            Submit Test
-          </button>
-        </div>
+
+        <ActionButton onClick={handleFinish} variant="danger">
+           Submit Test
+        </ActionButton>
       </header>
 
-      {/* SPLIT SCREEN MAIN */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden h-full">
-        {/* LEFT PANE: PASSAGE */}
+      {/* COCKPIT SPLIT SCREEN */}
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden relative">
+        
+        {/* LEFT PANE (Passage) - Glass Panel */}
         <section 
           ref={leftPaneRef}
-          className="bg-white border-r border-gray-300 overflow-y-auto h-full p-8 custom-scrollbar relative"
+          className={`
+            overflow-y-auto p-6 md:p-8 custom-scrollbar absolute md:relative w-full h-full transition-transform duration-500 ease-spring
+            bg-slate-900/50 border-r border-white/5
+            ${mobileTab === 'passage' ? 'translate-x-0 z-10' : '-translate-x-full md:translate-x-0'}
+          `}
         >
-          <h2 className="text-xl font-bold mb-4 md:hidden">{currentPassage.title}</h2>
-          <AnimatePresence mode="wait">
-            <motion.div
-                key={currentPassageIndex}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-                className="prose max-w-none text-gray-800 leading-7 font-serif text-lg"
-                dangerouslySetInnerHTML={{ __html: currentPassage.content }}
-            />
-          </AnimatePresence>
+          <div className="max-w-prose mx-auto">
+             <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 md:hidden">
+              {currentPassage.title}
+            </h2>
+            <AnimatePresence mode="wait">
+              <motion.div
+                  key={currentPassageIndex}
+                  initial={{ opacity: 0, y: 10, rotateX: 10 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="prose prose-invert prose-lg max-w-none text-slate-300 leading-8"
+                  dangerouslySetInnerHTML={{ __html: currentPassage.content }}
+              />
+            </AnimatePresence>
+          </div>
         </section>
 
-        {/* RIGHT PANE: QUESTIONS */}
+        {/* RIGHT PANE (Questions) - Glass Panel */}
         <section 
           ref={rightPaneRef}
-          className="bg-gray-50 overflow-y-auto h-full p-8 custom-scrollbar"
+          className={`
+            overflow-y-auto p-4 md:p-8 custom-scrollbar absolute md:relative w-full h-full bg-slate-800/30 transition-transform duration-500 ease-spring
+            ${mobileTab === 'questions' ? 'translate-x-0 z-10' : 'translate-x-full md:translate-x-0'}
+          `}
         >
-          <div className="max-w-3xl mx-auto space-y-8">
+          <div className="max-w-3xl mx-auto space-y-8 pb-10">
             <AnimatePresence mode="wait">
             <motion.div
                  key={currentPassageIndex}
-                 initial={{ opacity: 0, x: 20 }}
+                 initial={{ opacity: 0, x: 50 }}
                  animate={{ opacity: 1, x: 0 }}
-                 exit={{ opacity: 0, x: -20 }}
-                 transition={{ duration: 0.3 }}
-                 className="space-y-8"
+                 exit={{ opacity: 0, x: -50 }}
+                 transition={{ duration: 0.3, type: "spring" }}
+                 className="space-y-6"
             >
             {currentPassage.questions.map((q) => (
-              <div key={q.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                
-                {/* TFNG / YES_NO_NOT_GIVEN */}
-                {(q.type === 'TFNG' || q.type === 'YES_NO_NOT_GIVEN') && (
-                  <div>
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <span className="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded min-w-[2.5rem] text-center">
-                        Q{q.id}
-                      </span>
-                      <p className="text-gray-800 font-medium">{q.text}</p>
-                    </div>
-                    <select
-                      className="w-full md:w-1/2 mt-2 p-2 border border-gray-300 rounded bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      value={userAnswers[q.id] || ''}
-                      onChange={(e) => setAnswer(q.id, e.target.value)}
-                    >
-                      <option value="">Select Answer...</option>
-                      {q.type === 'TFNG' 
-                        ? ['TRUE', 'FALSE', 'NOT GIVEN'].map(o => <option key={o} value={o}>{o}</option>)
-                        : ['YES', 'NO', 'NOT GIVEN'].map(o => <option key={o} value={o}>{o}</option>)
-                      }
-                    </select>
-                  </div>
-                )}
+              <div 
+                key={q.id} 
+                id={`question-${q.id}`} 
+                className="
+                  relative bg-[#1e293b] p-6 rounded-xl border border-white/5 shadow-xl
+                  before:absolute before:inset-0 before:rounded-xl before:border before:border-white/10 before:bg-gradient-to-b before:from-white/5 before:to-transparent before:pointer-events-none
+                "
+              >
+                {/* 3D Question Label */}
+                <div className="absolute -left-2 -top-2 w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg shadow-lg flex items-center justify-center border border-white/20 transform rotate-3">
+                  <span className="font-bold text-white text-sm">Q{q.id}</span>
+                </div>
 
-                {/* GAP FILL / SHORT ANSWER */}
-                {(q.type === 'GAP_FILL' || q.type === 'SHORT_ANSWER') && (
-                   <div>
-                     <div className="flex items-baseline gap-3 mb-3">
-                       <span className="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded min-w-[2.5rem] text-center">
-                         Q{q.id}
-                       </span>
-                       <p className="text-gray-800 font-medium">
+                <div className="pl-6 pt-2">
+                   {(q.type === 'TFNG' || q.type === 'YES_NO_NOT_GIVEN' || q.type === 'MATCHING_HEADINGS') && (
+                     <>
+                        <p className="text-slate-200 font-medium mb-4 text-lg">{q.text || `Heading for ${q.target}`}</p>
+                        <div className="relative">
+                          <select
+                            className="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow shadow-inner"
+                            value={userAnswers[q.id] || ''}
+                            onChange={(e) => setAnswer(q.id, e.target.value)}
+                          >
+                            <option value="">Select Answer...</option>
+                            {q.options?.map(o => <option key={o} value={o}>{o}</option>) || 
+                             (q.type === 'TFNG' ? ['TRUE', 'FALSE', 'NOT GIVEN'] : ['YES', 'NO', 'NOT GIVEN']).map(o => <option key={o} value={o}>{o}</option>)
+                            }
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                          </div>
+                        </div>
+                     </>
+                   )}
+
+                   {(q.type === 'GAP_FILL' || q.type === 'SHORT_ANSWER') && (
+                     <>
+                       <p className="text-slate-200 font-medium mb-4 text-lg leading-relaxed">
                          {q.text} 
-                         {q.limit && <span className="text-xs text-red-500 ml-2 font-normal uppercase tracking-wider">({q.limit.replace(/_/g, ' ')})</span>}
+                         {q.limit && <span className="ml-2 inline-block px-2 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-widest">{q.limit.replace(/_/g, ' ')}</span>}
                        </p>
-                     </div>
-                     <input
-                       type="text"
-                       className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:outline-none font-medium"
-                       placeholder="Type your answer..."
-                       value={userAnswers[q.id] || ''}
-                       onChange={(e) => setAnswer(q.id, e.target.value)}
-                     />
-                   </div>
-                )}
+                       <input
+                         type="text"
+                         className="w-full bg-slate-900 text-white border border-slate-700 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none shadow-inner"
+                         placeholder="Type your answer..."
+                         value={userAnswers[q.id] || ''}
+                         onChange={(e) => setAnswer(q.id, e.target.value)}
+                       />
+                     </>
+                   )}
 
-                 {/* MATCHING HEADINGS */}
-                 {q.type === 'MATCHING_HEADINGS' && (
-                  <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
-                     <div className="flex items-center gap-3">
-                       <span className="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded min-w-[2.5rem] text-center">
-                         Q{q.id}
-                       </span>
-                       <p className="text-gray-800 font-medium">Heading for <strong>{q.target}</strong></p>
-                     </div>
-                     <select
-                      className="w-full md:w-40 p-2 border border-gray-300 rounded bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      value={userAnswers[q.id] || ''}
-                      onChange={(e) => setAnswer(q.id, e.target.value)}
-                    >
-                      <option value="">Select...</option>
-                      {q.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                   </div>
-                )}
-
-                {/* MCQ */}
-                {q.type === 'MCQ' && (
-                  <div>
-                    <div className="flex items-baseline gap-3 mb-4">
-                       <span className="bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded min-w-[2.5rem] text-center">
-                         Q{q.id}
-                       </span>
-                       <p className="text-gray-800 font-medium">{q.text}</p>
-                     </div>
-                     <div className="space-y-2 pl-10">
-                       {q.options?.map((opt) => {
-                         const val = opt.charAt(0); // Assuming "A. Text" format
-                         return (
-                           <label key={opt} className="flex items-start gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded">
-                             <input
-                               type="radio"
-                               name={`q-${q.id}`}
-                               className="mt-1"
-                               value={val}
-                               checked={userAnswers[q.id] === val}
-                               onChange={() => setAnswer(q.id, val)}
-                             />
-                             <span className="text-gray-700">{opt}</span>
-                           </label>
-                         )
-                       })}
-                     </div>
-                  </div>
-                )}
-
+                   {q.type === 'MCQ' && (
+                      <>
+                        <p className="text-slate-200 font-medium mb-4 text-lg">{q.text}</p>
+                        <div className="space-y-3">
+                          {q.options?.map((opt) => {
+                            const val = opt.charAt(0);
+                            const isSelected = userAnswers[q.id] === val;
+                            return (
+                              <label 
+                                key={opt} 
+                                className={`
+                                  relative flex items-center gap-4 p-4 rounded-lg cursor-pointer transition-all duration-200 border
+                                  ${isSelected 
+                                    ? 'bg-blue-600/20 border-blue-500/50 shadow-[0_0_15px_rgba(37,99,235,0.2)]' 
+                                    : 'bg-slate-900 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
+                                  }
+                                `}
+                              >
+                                <div className={`
+                                  w-5 h-5 rounded-full border-2 flex items-center justify-center
+                                  ${isSelected ? 'border-blue-400' : 'border-slate-500'}
+                                `}>
+                                  {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-blue-400" />}
+                                </div>
+                                <input
+                                  type="radio"
+                                  name={`q-${q.id}`}
+                                  className="hidden"
+                                  value={val}
+                                  checked={isSelected}
+                                  onChange={() => setAnswer(q.id, val)}
+                                />
+                                <span className="text-slate-300">{opt}</span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </>
+                   )}
+                </div>
               </div>
             ))}
             </motion.div>
@@ -247,59 +299,59 @@ const TestPlayer: React.FC = () => {
         </section>
       </main>
 
-      {/* FOOTER */}
-      <footer className="h-20 bg-gray-200 border-t border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
-        <div className="flex items-center gap-4">
-           <button 
-             onClick={prevPassage} 
-             disabled={currentPassageIndex === 0}
-             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
-           >
-             <ChevronLeft className="w-5 h-5 text-gray-700" />
-           </button>
-           <span className="font-semibold text-gray-700 whitespace-nowrap min-w-[100px] text-center">
-             Passage {currentPassageIndex + 1} / {totalPassages}
-           </span>
-           <button 
-             onClick={nextPassage} 
-             disabled={currentPassageIndex === totalPassages - 1}
-             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
-           >
-             <ChevronRight className="w-5 h-5 text-gray-700" />
-           </button>
+      {/* FOOTER CONTROL DECK */}
+      <footer className="h-24 bg-[#0f172a] border-t border-white/10 flex items-center justify-between px-6 flex-shrink-0 z-40 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20 pointer-events-none"></div>
+        
+        <div className="relative z-10 flex items-center gap-4">
+           <ActionButton onClick={prevPassage} disabled={currentPassageIndex === 0} variant="secondary">
+             <ChevronLeft className="w-5 h-5" />
+           </ActionButton>
+           
+           <div className="flex flex-col items-center">
+             <span className="text-[10px] text-slate-500 uppercase tracking-[0.2em] font-bold">Sector</span>
+             <span className="font-mono text-xl text-white font-bold">{currentPassageIndex + 1} <span className="text-slate-600">/</span> {totalPassages}</span>
+           </div>
+
+           <ActionButton onClick={nextPassage} disabled={currentPassageIndex === totalPassages - 1} variant="secondary">
+             <ChevronRight className="w-5 h-5" />
+           </ActionButton>
         </div>
 
-        {/* QUESTION PALETTE */}
-        <div className="flex-1 overflow-x-auto mx-4 md:mx-8 custom-scrollbar">
-           <div className="flex gap-2 pb-2">
-             {allQuestions.map(q => (
-               <button
-                 key={q.id}
-                 onClick={() => {
-                   const targetP = getPassageIndexForQuestion(q.id);
-                   if (targetP !== -1) setPassage(targetP);
-                 }}
-                 className={`
-                   w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold rounded border transition-all duration-200
-                   ${userAnswers[q.id] 
-                     ? 'bg-gray-800 text-white border-gray-800 transform hover:scale-110' 
-                     : 'bg-white text-gray-600 border-gray-400 hover:border-gray-800 hover:bg-gray-100'
-                   }
-                   ${q.id >= currentPassage.questions[0].id && q.id <= currentPassage.questions[currentPassage.questions.length-1].id ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-                 `}
-               >
-                 {q.id}
-               </button>
-             ))}
+        {/* 3D QUESTION PALETTE */}
+        <div className="relative z-10 flex-1 overflow-x-auto mx-8 custom-scrollbar pb-2">
+           <div className="flex gap-2 items-center h-full pt-1">
+             {allQuestions.map(q => {
+               const isActive = q.id >= currentPassage.questions[0].id && q.id <= currentPassage.questions[currentPassage.questions.length-1].id;
+               const isAnswered = !!userAnswers[q.id];
+
+               return (
+                 <button
+                   key={q.id}
+                   onClick={() => handlePaletteClick(q.id)}
+                   className={`
+                     group relative w-10 h-10 flex-shrink-0 flex items-center justify-center font-bold text-sm rounded-lg transition-all duration-300
+                     ${isAnswered 
+                        ? 'bg-emerald-600 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)]' 
+                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                     }
+                     ${isActive ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900 -translate-y-1 scale-110' : ''}
+                   `}
+                 >
+                   {q.id}
+                   {isActive && <div className="absolute -bottom-2 w-1 h-1 bg-blue-400 rounded-full shadow-[0_0_5px_#60a5fa]"></div>}
+                 </button>
+               )
+             })}
            </div>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500 hidden md:flex">
-          <AlertCircle className="w-4 h-4" />
-          <span>Review all answers before submitting</span>
+        <div className="relative z-10 hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900/50 border border-white/5">
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <span className="text-xs text-slate-400 font-mono">SYSTEM ONLINE</span>
         </div>
       </footer>
-    </div>
+    </motion.div>
   );
 };
 
