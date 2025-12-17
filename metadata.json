@@ -1,5 +1,7 @@
 {
   "name": "IELTS Academic Reading Vol. 1",
   "description": "A comprehensive IELTS Academic Reading mock test application featuring vocabulary building, grammar focus, and a full computer-delivered test simulation.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "microphone"
+  ]
 }

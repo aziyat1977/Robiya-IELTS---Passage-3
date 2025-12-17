@@ -1,17 +1,170 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { VocabItem, GrammarVisual } from '../types';
+
+// --- Utility: Shuffle Array ---
+const shuffle = <T,>(array: T[]): T[] => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
+
+// --- Component: Audio Recorder ---
+const AudioRecorder = ({ questionId }: { questionId: string }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      chunksRef.current = [];
+
+      mediaRecorderRef.current.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+        // Persist "recorded" status (not the blob itself due to limits) to local storage
+        localStorage.setItem(`rec_${questionId}`, 'true');
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } catch (err) {
+      alert("Microphone access denied or not available.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const downloadAudio = () => {
+    if (audioUrl) {
+      const a = document.createElement('a');
+      a.href = audioUrl;
+      a.download = `recording_${questionId}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  return (
+    <div className="bg-slate-800/50 p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        {!isRecording ? (
+          <button 
+            onClick={startRecording}
+            className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center shadow-lg transition-colors"
+          >
+            <Mic className="w-6 h-6 text-white" />
+          </button>
+        ) : (
+          <button 
+            onClick={stopRecording}
+            className="w-12 h-12 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center shadow-lg transition-colors border-2 border-red-500 animate-pulse"
+          >
+            <Square className="w-5 h-5 text-white" />
+          </button>
+        )}
+        
+        {audioUrl && !isRecording && (
+          <audio src={audioUrl} controls className="h-10 w-48" />
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        {audioUrl && (
+          <button onClick={downloadAudio} className="p-2 bg-blue-600 rounded-lg hover:bg-blue-500 text-white transition-colors" title="Download Recording">
+            <Download className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// --- Component: Animated Grammar Visualizer ---
+const GrammarVisualizer: React.FC<{ visual: GrammarVisual }> = ({ visual }) => {
+  const [step, setStep] = useState(0);
+
+  const currentStep = visual.steps[step];
+  const words = currentStep.text.split(" ");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep((prev) => (prev + 1) % visual.steps.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [visual]);
+
+  return (
+    <div className="bg-slate-900/80 rounded-2xl p-6 border border-purple-500/30 shadow-2xl relative overflow-hidden mb-8">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-blue-500" />
+      <h4 className="text-sm font-bold text-purple-300 uppercase tracking-widest mb-6 text-center">{visual.title}</h4>
+      
+      <div className="h-24 flex items-center justify-center relative">
+        <LayoutGroup>
+          <motion.div layout className="flex gap-3 flex-wrap justify-center">
+            {words.map((word, i) => {
+              const isHighlighted = currentStep.highlightIndices.includes(i);
+              return (
+                <motion.div
+                  key={`${word}-${i}`} // simple key for demo, normally unique ID
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0, 
+                    scale: isHighlighted ? 1.2 : 1,
+                    color: isHighlighted ? '#a78bfa' : '#cbd5e1',
+                    fontWeight: isHighlighted ? 800 : 400
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="text-2xl md:text-3xl"
+                >
+                  {word}
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </LayoutGroup>
+      </div>
+
+      <motion.div 
+        key={step}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center text-blue-200 font-mono mt-4 bg-blue-900/30 inline-block px-4 py-1 rounded-full mx-auto block w-max"
+      >
+        {currentStep.annotation}
+      </motion.div>
+    </div>
+  );
+};
 
 const LessonMode: React.FC = () => {
   const { moduleData } = useReading();
   const location = useLocation();
   const isVocab = location.pathname.includes('vocab');
   
-  const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
+  const [activeTab, setActiveTab] = useState<'learn' | 'quiz' | 'practice'>('learn');
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState(false);
+
+  // Randomize quiz options on mount or when switching to quiz tab
+  const [randomizedItems, setRandomizedItems] = useState<any[]>([]);
 
   useEffect(() => {
     setActiveTab('learn');
@@ -19,8 +172,19 @@ const LessonMode: React.FC = () => {
     setShowResults(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (activeTab === 'quiz') {
+      const items = isVocab ? moduleData.vocabSection.flatMap(v => v.quiz) : moduleData.grammarSection.quiz;
+      const randomized = items.map(q => ({
+        ...q,
+        options: q.options ? shuffle(q.options) : undefined
+      }));
+      setRandomizedItems(randomized);
+    }
+  }, [activeTab, isVocab, moduleData]);
+
   const title = isVocab ? "Vocabulary Focus" : "Grammar Focus";
-  const items = isVocab ? moduleData.vocabSection : [];
+  const vocabItems = moduleData.vocabSection;
   const grammar = moduleData.grammarSection;
 
   const handleQuizSubmit = () => setShowResults(true);
@@ -36,8 +200,8 @@ const LessonMode: React.FC = () => {
       <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-600/20 blur-[100px] rounded-full mix-blend-screen pointer-events-none"></div>
 
       {/* Glass Header */}
-      <header className="sticky top-0 z-20 px-6 py-4 flex items-center justify-between bg-[#0f172a]/70 backdrop-blur-xl border-b border-white/10">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-20 px-4 py-4 md:px-6 flex flex-col md:flex-row items-center justify-between bg-[#0f172a]/90 backdrop-blur-xl border-b border-white/10 gap-4">
+        <div className="flex items-center gap-4 w-full md:w-auto">
           <Link to="/reading" className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 hover:text-white">
             <ArrowLeft className="w-5 h-5" />
           </Link>
@@ -45,36 +209,46 @@ const LessonMode: React.FC = () => {
             {title}
           </h1>
         </div>
-        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 relative">
+        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 relative w-full md:w-auto overflow-hidden">
           <motion.div 
               layoutId="tab-bg"
               className="absolute bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg rounded-lg"
               initial={false}
               animate={{ 
-                  x: activeTab === 'learn' ? 0 : '100%', 
-                  width: '50%'
+                  x: activeTab === 'learn' ? 0 : activeTab === 'quiz' ? '100%' : '200%', 
+                  width: isVocab ? '33.33%' : '50%'
               }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               style={{ height: 'calc(100% - 8px)', top: 4, left: 0 }}
           />
           <button 
             onClick={() => setActiveTab('learn')}
-            className={`px-8 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors relative z-10 ${activeTab === 'learn' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors relative z-10 ${activeTab === 'learn' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
           >
             LEARN
           </button>
           <button 
             onClick={() => setActiveTab('quiz')}
-            className={`px-8 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors relative z-10 ${activeTab === 'quiz' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+            className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors relative z-10 ${activeTab === 'quiz' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
           >
             QUIZ
           </button>
+          {isVocab && (
+            <button 
+              onClick={() => setActiveTab('practice')}
+              className={`flex-1 md:flex-none px-6 py-2 rounded-lg text-sm font-bold tracking-wide transition-colors relative z-10 ${activeTab === 'practice' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+            >
+              SPEAKING
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow p-6 md:p-8 max-w-5xl mx-auto w-full relative z-10">
+      <main className="flex-grow p-6 md:p-8 max-w-6xl mx-auto w-full relative z-10">
         <AnimatePresence mode="wait">
+        
+        {/* === LEARN TAB === */}
         {activeTab === 'learn' && (
           <motion.div 
             key="learn"
@@ -85,35 +259,47 @@ const LessonMode: React.FC = () => {
             className="perspective-1000"
           >
             {isVocab ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {items.map((item, idx) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {vocabItems.map((item, idx) => (
                   <motion.div 
                     key={idx} 
                     initial={{ opacity: 0, y: 50, rotateX: 20 }}
                     animate={{ opacity: 1, y: 0, rotateX: 0 }}
                     transition={{ delay: idx * 0.1, type: "spring" }}
                     whileHover={{ scale: 1.02, rotateX: 5 }}
-                    className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all group"
+                    className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all group flex flex-col"
                   >
-                    <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-2 group-hover:scale-105 origin-left transition-transform">
-                        {item.word}
-                    </h3>
-                    <div className="h-0.5 w-10 bg-gradient-to-r from-blue-500 to-transparent mb-4"></div>
-                    <p className="text-slate-300 leading-relaxed text-lg">{item.definition}</p>
+                    <div className="flex-grow">
+                      <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-2 group-hover:scale-105 origin-left transition-transform">
+                          {item.word}
+                      </h3>
+                      <div className="h-0.5 w-10 bg-gradient-to-r from-blue-500 to-transparent mb-4"></div>
+                      <p className="text-slate-300 leading-relaxed text-lg">{item.definition}</p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
             ) : (
-              <div className="space-y-8">
-                <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
-                    <h2 className="text-4xl font-black text-white mb-6 flex items-center gap-3">
-                        <Layers className="w-8 h-8 text-purple-400" />
-                        {grammar.topic}
-                    </h2>
-                    <div className="prose prose-invert prose-lg max-w-none text-slate-200" dangerouslySetInnerHTML={{ __html: grammar.content }} />
+              <div className="space-y-12">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
+                      <h2 className="text-4xl font-black text-white mb-6 flex items-center gap-3">
+                          <Layers className="w-8 h-8 text-purple-400" />
+                          {grammar.topic}
+                      </h2>
+                      <div className="prose prose-invert prose-lg max-w-none text-slate-200" dangerouslySetInnerHTML={{ __html: grammar.content }} />
+                  </div>
+                  
+                  {/* Grammar Visuals */}
+                  <div className="space-y-6">
+                    {grammar.visuals?.map((vis, idx) => (
+                      <GrammarVisualizer key={idx} visual={vis} />
+                    ))}
+                  </div>
                 </div>
                 
+                <h3 className="text-2xl font-bold text-white border-l-4 border-blue-500 pl-4">Concrete Examples</h3>
                 <div className="grid gap-6">
                     {grammar.examples.map((ex, idx) => (
                         <motion.div 
@@ -121,16 +307,19 @@ const LessonMode: React.FC = () => {
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 + (idx * 0.1) }}
-                            className="bg-slate-900/80 p-6 rounded-xl border-l-4 border-purple-500 shadow-lg"
+                            className="bg-slate-900/80 p-6 rounded-xl border border-white/10 shadow-lg hover:border-blue-500/50 transition-colors"
                         >
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original</span>
-                                    <p className="text-lg text-slate-300 mt-1 font-medium">{ex.original}</p>
+                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original Sentence</span>
+                                    <p className="text-lg text-slate-300 mt-2 font-medium">{ex.original}</p>
                                 </div>
-                                <div className="md:border-l border-white/10 md:pl-6">
-                                    <span className="text-xs font-bold text-purple-400 uppercase tracking-widest">Transformed</span>
-                                    <p className="text-lg text-white font-bold mt-1" dangerouslySetInnerHTML={{ __html: ex.nominalized }} />
+                                <div className="md:border-l border-white/10 md:pl-6 relative">
+                                    <div className="absolute top-0 left-0 -ml-3 mt-1 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-xs shadow-lg md:block hidden">
+                                      <ChevronRight className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Academic Transformation</span>
+                                    <p className="text-lg text-white font-bold mt-2" dangerouslySetInnerHTML={{ __html: ex.nominalized }} />
                                 </div>
                             </div>
                             <div className="mt-4 pt-4 border-t border-white/5 flex items-start gap-2 text-sm text-slate-400 italic">
@@ -144,6 +333,7 @@ const LessonMode: React.FC = () => {
           </motion.div>
         )}
 
+        {/* === QUIZ TAB === */}
         {activeTab === 'quiz' && (
           <motion.div 
             key="quiz"
@@ -163,8 +353,8 @@ const LessonMode: React.FC = () => {
                 )}
               </div>
 
-              <div className="space-y-10">
-                {(isVocab ? items.map(i => i.quiz) : grammar.quiz).map((q, idx) => {
+              <div className="space-y-12">
+                {randomizedItems.map((q, idx) => {
                   const isCorrect = quizAnswers[idx] === q.correct; 
                   const isAnswerCorrect = 
                     isCorrect || 
@@ -172,27 +362,32 @@ const LessonMode: React.FC = () => {
                     (quizAnswers[idx]?.trim() === q.correct);
 
                   return (
-                    <div key={idx} className="relative">
-                      <p className="text-xl font-medium mb-5 text-white leading-loose">
-                        <span className="inline-block w-8 h-8 text-center leading-8 rounded bg-white/5 text-sm font-mono mr-3 text-slate-400">{idx + 1}</span>
+                    <div key={idx} className="relative bg-white/5 p-6 rounded-2xl border border-white/5">
+                       <span className="absolute -top-3 -left-3 w-8 h-8 text-center leading-8 rounded-lg bg-blue-600 text-sm font-bold text-white shadow-lg">{idx + 1}</span>
+                      
+                      <p className="text-xl font-medium mb-6 text-white leading-loose mt-2">
                         {isVocab ? (
                             <>
-                            {q.question.split('____').map((part, i, arr) => (
+                            {q.question.split('____').map((part: string, i: number, arr: string[]) => (
                                 <React.Fragment key={i}>
                                     {part}
                                     {i < arr.length - 1 && (
-                                        <span className="inline-block w-32 border-b-2 border-dashed border-slate-600 mx-2"></span>
+                                        <span className="inline-block min-w-[100px] border-b-2 border-dashed border-slate-500 mx-2 text-blue-300 text-center">
+                                           {showResults && !q.options ? (isAnswerCorrect ? q.answer : <span className="text-red-400">{quizAnswers[idx] || "..."}</span>) : ""}
+                                        </span>
                                     )}
                                 </React.Fragment>
                             ))}
                             </>
                         ) : (
                             <>
-                                {q.transform?.split('____').map((part, i, arr) => (
+                                {q.transform?.split('____').map((part: string, i: number, arr: string[]) => (
                                 <React.Fragment key={i}>
                                     {part}
                                     {i < arr.length - 1 && (
-                                        <span className="inline-block w-32 border-b-2 border-dashed border-slate-600 mx-2"></span>
+                                         <span className="inline-block min-w-[100px] border-b-2 border-dashed border-slate-500 mx-2 text-blue-300 text-center">
+                                           {showResults && !q.options ? (isAnswerCorrect ? q.answer : <span className="text-red-400">{quizAnswers[idx] || "..."}</span>) : ""}
+                                        </span>
                                     )}
                                 </React.Fragment>
                             ))}
@@ -200,15 +395,15 @@ const LessonMode: React.FC = () => {
                         )}
                       </p>
 
-                      <div className="pl-11">
+                      <div className="">
                         {q.options ? (
                           <div className="flex gap-4 flex-wrap">
-                            {q.options.map((opt) => (
+                            {q.options.map((opt: string) => (
                               <button
                                 key={opt}
                                 disabled={showResults}
                                 onClick={() => setQuizAnswers(prev => ({ ...prev, [idx]: opt }))}
-                                className={`px-6 py-3 rounded-xl border font-bold transition-all transform hover:scale-105 ${
+                                className={`px-6 py-3 rounded-xl border font-bold transition-all transform hover:scale-105 flex-1 min-w-[150px] ${
                                   quizAnswers[idx] === opt
                                     ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
                                     : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-800'
@@ -219,30 +414,33 @@ const LessonMode: React.FC = () => {
                             ))}
                           </div>
                         ) : (
-                          <input 
-                            type="text" 
-                            disabled={showResults}
-                            value={quizAnswers[idx] || ''}
-                            onChange={(e) => setQuizAnswers(prev => ({ ...prev, [idx]: e.target.value }))}
-                            className="bg-slate-800/50 border border-slate-600 text-white rounded-xl px-4 py-3 w-full max-w-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                            placeholder="Input data..."
-                          />
+                          <div className="flex flex-col gap-2">
+                            <input 
+                              type="text" 
+                              disabled={showResults}
+                              value={quizAnswers[idx] || ''}
+                              onChange={(e) => setQuizAnswers(prev => ({ ...prev, [idx]: e.target.value }))}
+                              className="bg-slate-800/50 border border-slate-600 text-white rounded-xl px-4 py-3 w-full max-w-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                              placeholder="Type answer here..."
+                            />
+                            {!isVocab && <div className="text-sm text-slate-400 mt-1">Original: <em>{q.original}</em></div>}
+                          </div>
                         )}
 
                         <AnimatePresence>
                         {showResults && (
                            <motion.div 
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className={`mt-4 inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold border ${isAnswerCorrect ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              className={`mt-4 inline-flex items-center px-4 py-3 rounded-lg text-sm font-bold border w-full ${isAnswerCorrect ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-red-500/10 border-red-500/30 text-red-400'}`}
                            >
                              { isAnswerCorrect ? (
                                  <>
-                                  <CheckCircle className="w-5 h-5 mr-2" /> CORRECT
+                                  <CheckCircle className="w-5 h-5 mr-3" /> CORRECT
                                  </>
                              ) : (
                                  <>
-                                  <XCircle className="w-5 h-5 mr-2" /> INCORRECT — REF: {q.correct || q.answer}
+                                  <XCircle className="w-5 h-5 mr-3" /> INCORRECT — ANSWER: <span className="text-white ml-2 uppercase tracking-wider">{q.correct || q.answer}</span>
                                  </>
                              )}
                            </motion.div>
@@ -269,6 +467,44 @@ const LessonMode: React.FC = () => {
             </div>
           </motion.div>
         )}
+
+        {/* === PRACTICE TAB (Vocab Only) === */}
+        {activeTab === 'practice' && isVocab && (
+          <motion.div
+            key="practice"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.5 }}
+            className="space-y-8"
+          >
+            <div className="bg-slate-900/50 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl">
+              <h2 className="text-2xl font-bold text-white mb-2">Speaking Lab</h2>
+              <p className="text-slate-400 mb-8">Record your answers to practice using these vocabulary words in context. Download your recordings to review later.</p>
+
+              <div className="space-y-12">
+                {vocabItems.map((item, idx) => (
+                  <div key={idx} className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                    <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6 flex items-center">
+                       <span className="bg-blue-600/20 text-blue-300 text-sm font-bold px-2 py-1 rounded mr-3 uppercase">Word</span>
+                       {item.word}
+                    </h3>
+                    
+                    <div className="grid gap-6">
+                      {item.speakingQuestions.map((question, qIdx) => (
+                        <div key={qIdx} className="bg-slate-900/50 p-4 rounded-xl border border-white/5">
+                          <p className="text-lg text-slate-200 mb-4 font-medium">"{question}"</p>
+                          <AudioRecorder questionId={`${item.word}_${qIdx}`} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         </AnimatePresence>
       </main>
     </div>

@@ -9,76 +9,153 @@ export const readingData: ModuleData = {
     {
       word: "Rampart",
       definition: "A defensive wall of a castle or walled city.",
-      quiz: {
-        question: "The soldiers stood on the ____ to watch for approaching enemies.",
-        options: ["rampart", "threshold", "ditch"],
-        correct: "rampart"
-      }
+      speakingQuestions: [
+        "Describe a historical place you have visited that had walls or ramparts.",
+        "Do you think modern cities need defensive structures like ramparts?",
+        "How do historical ramparts contribute to tourism in a country?",
+        "What kind of protection do modern buildings rely on instead of ramparts?",
+        "If you could design a castle, would you include a rampart? Why?"
+      ],
+      quiz: [
+        {
+          question: "The soldiers stood on the ____ to watch for approaching enemies.",
+          options: ["rampart", "threshold", "ditch", "spire"],
+          correct: "rampart"
+        },
+        {
+          question: "The ancient city was surrounded by a massive stone ____.",
+          options: ["moat", "rampart", "market", "garden"],
+          correct: "rampart"
+        }
+      ]
     },
     {
       word: "Inhospitable",
       definition: "(of an environment) harsh and difficult to live in.",
-      quiz: {
-        question: "The desert is an ____ place for humans without modern technology.",
-        options: ["inhospitable", "resilient", "nuanced"],
-        correct: "inhospitable"
-      }
+      speakingQuestions: [
+        "What is the most inhospitable place you can imagine visiting?",
+        "How have humans adapted to live in inhospitable climates?",
+        "Do you prefer hot or cold climates? Which is more inhospitable?",
+        "Should humans try to colonize inhospitable planets like Mars?",
+        "Describe a time you felt a social situation was inhospitable or unwelcoming."
+      ],
+      quiz: [
+        {
+          question: "The desert is an ____ place for humans without modern technology.",
+          options: ["inhospitable", "resilient", "nuanced", "welcoming"],
+          correct: "inhospitable"
+        },
+        {
+          question: "Due to the extreme cold, the Antarctic is largely ____.",
+          options: ["crowded", "inhospitable", "agricultural", "urban"],
+          correct: "inhospitable"
+        }
+      ]
     },
     {
       word: "Extinguish",
       definition: "To cause to cease to exist; to wipe out completely.",
-      quiz: {
-        question: "The hope of finding survivors was ____ after a week of searching.",
-        options: ["extinguished", "cascading", "proliferated"],
-        correct: "extinguished"
-      }
+      speakingQuestions: [
+        "How do firefighters extinguish dangerous fires?",
+        "What steps can we take to ensure endangered species are not extinguished?",
+        "Have you ever had a dream or ambition that was extinguished? What happened?",
+        "Do you think technology will eventually extinguish traditional reading habits?",
+        "Is it important to extinguish campfires completely before leaving a campsite?"
+      ],
+      quiz: [
+        {
+          question: "The hope of finding survivors was ____ after a week of searching.",
+          options: ["extinguished", "cascading", "proliferated", "ignited"],
+          correct: "extinguished"
+        },
+        {
+          question: "Firefighters worked through the night to ____ the blaze.",
+          options: ["extinguish", "fuel", "observe", "construct"],
+          correct: "extinguish"
+        }
+      ]
     },
     {
       word: "Commodification",
       definition: "Treating something (like attention) as a product to be bought and sold.",
-      quiz: {
-        question: "The ____ of personal data is a major concern in the digital age.",
-        options: ["commodification", "mitigation", "resilience"],
-        correct: "commodification"
-      }
+      speakingQuestions: [
+        "What is your opinion on the commodification of personal data?",
+        "Do you think the commodification of art ruins its artistic value?",
+        "How has the commodification of education changed how students learn?",
+        "Is it ethical to allow the commodification of natural resources like water?",
+        "Discuss how social media leads to the commodification of human attention."
+      ],
+      quiz: [
+        {
+          question: "The ____ of personal data is a major concern in the digital age.",
+          options: ["commodification", "mitigation", "resilience", "celebration"],
+          correct: "commodification"
+        },
+        {
+          question: "Critics argue that the ____ of healthcare puts profits before patients.",
+          options: ["healing", "commodification", "research", "structure"],
+          correct: "commodification"
+        }
+      ]
     },
     {
       word: "Irreversible",
       definition: "Not possible to undo or alter.",
-      quiz: {
-        question: "Scientists warn that climate change may soon reach an ____ point.",
-        options: ["irreversible", "inhospitable", "sovereign"],
-        correct: "irreversible"
-      }
+      speakingQuestions: [
+        "What are some irreversible effects of climate change?",
+        "Have you ever made a decision that was irreversible?",
+        "Do you think plastic surgery should be irreversible?",
+        "How should society deal with irreversible damage to the environment?",
+        "Is growing up an irreversible process that we should embrace?"
+      ],
+      quiz: [
+        {
+          question: "Scientists warn that climate change may soon reach an ____ point.",
+          options: ["irreversible", "inhospitable", "sovereign", "temporary"],
+          correct: "irreversible"
+        },
+        {
+          question: "Once the contract is signed, the decision is ____.",
+          options: ["flexible", "irreversible", "negotiable", "unknown"],
+          correct: "irreversible"
+        }
+      ]
     }
   ],
   grammarSection: {
     topic: "Nominalization",
-    content: `
-      <p class="mb-4"><strong>Nominalization</strong> is the process of turning verbs (actions) or adjectives (descriptions) into nouns (things). This is a hallmark of academic writing because it shifts the focus from <em>who is doing the action</em> to <em>the concept or result itself</em>.</p>
-      <p class="mb-4">Using nominalization allows you to:</p>
-      <ul class="list-disc pl-5 mb-4 space-y-2">
-        <li>Create a more objective, formal tone.</li>
-        <li>Pack more information into a single sentence (lexical density).</li>
-        <li>Improve text cohesion by linking back to previous ideas.</li>
-      </ul>
-      <p>In the IELTS Reading test, you will often find that the question uses a verb (e.g., "The population grew") while the text uses the nominalized form (e.g., "The growth of the population"). Recognizing this relationship is key to finding answers.</p>
-    `,
+    content: "Nominalization transforms actions (verbs) and descriptions (adjectives) into concepts (nouns). This creates the 'Academic Tone' required for high IELTS scores.",
+    visuals: [
+      {
+        title: "Verb to Noun Transformation",
+        steps: [
+          { text: "The population GREW rapidly.", highlightIndices: [2], annotation: "Active Verb" },
+          { text: "The rapid GROWTH of the population...", highlightIndices: [2], annotation: "Abstract Noun" }
+        ]
+      },
+      {
+        title: "Adjective to Noun Transformation",
+        steps: [
+          { text: "The chemical is DANGEROUS.", highlightIndices: [3], annotation: "Adjective" },
+          { text: "The DANGER of the chemical...", highlightIndices: [1], annotation: "Abstract Noun" }
+        ]
+      }
+    ],
     examples: [
       {
         original: "The population grew rapidly in the 19th century.",
         nominalized: "The rapid <strong>growth</strong> of the population in the 19th century caused overcrowding.",
-        explanation: "Here, the verb 'grew' becomes the noun 'growth'. The adverb 'rapidly' becomes the adjective 'rapid'."
+        explanation: "Action 'grew' becomes Concept 'growth'."
       },
       {
         original: "The chemicals reacted violently when mixed.",
         nominalized: "The violent <strong>reaction</strong> of the chemicals surprised the scientists.",
-        explanation: "The verb 'reacted' transforms into 'reaction', allowing the sentence to focus on the event rather than the chemicals."
+        explanation: "Action 'reacted' becomes Concept 'reaction'."
       },
       {
         original: "It is difficult to solve this complex problem.",
         nominalized: "The <strong>difficulty</strong> of solving this complex problem cannot be overstated.",
-        explanation: "The adjective 'difficult' changes to the abstract noun 'difficulty', making the statement more formal."
+        explanation: "Description 'difficult' becomes Concept 'difficulty'."
       }
     ],
     quiz: [
@@ -123,6 +200,20 @@ export const readingData: ModuleData = {
         original: "Students participated actively in the lesson.",
         transform: "Active ____ by students is encouraged.",
         answer: "participation"
+      },
+      {
+        question: "",
+        correct: "reduction",
+        original: "We need to reduce waste.",
+        transform: "The ____ of waste is essential.",
+        answer: "reduction"
+      },
+      {
+        question: "",
+        correct: "emphasis",
+        original: "The author emphasized the main point.",
+        transform: "The author put ____ on the main point.",
+        answer: "emphasis"
       }
     ]
   },
