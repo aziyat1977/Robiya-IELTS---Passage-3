@@ -35,22 +35,27 @@ export const ReadingProvider: React.FC<{ children: ReactNode }> = ({ children })
   const totalPassages = readingData.testData.passages.length;
   const allQuestions = readingData.testData.passages.flatMap(p => p.questions);
 
+  // Timer Tick Effect
   useEffect(() => {
     let interval: any;
-    if (isTimerActive && timeLeft > 0 && !isSubmitted) {
+    if (isTimerActive && !isSubmitted) {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 1) {
-            submitTest();
-            return 0;
-          }
+          if (prev <= 0) return 0;
           return prev - 1;
         });
       }, 1000);
     }
     return () => clearInterval(interval);
+  }, [isTimerActive, isSubmitted]);
+
+  // Auto-submit when time reaches 0
+  useEffect(() => {
+    if (timeLeft === 0 && isTimerActive && !isSubmitted) {
+      submitTest();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isTimerActive, timeLeft, isSubmitted]);
+  }, [timeLeft, isTimerActive, isSubmitted]);
 
   const startTest = () => {
     setIsTimerActive(true);

@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { Clock, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const TestPlayer: React.FC = () => {
   const {
+    moduleData,
     currentPassage,
     currentPassageIndex,
     totalPassages,
@@ -22,6 +24,8 @@ const TestPlayer: React.FC = () => {
   } = useReading();
 
   const navigate = useNavigate();
+  const leftPaneRef = useRef<HTMLDivElement>(null);
+  const rightPaneRef = useRef<HTMLDivElement>(null);
 
   // Initialize test on mount
   useEffect(() => {
@@ -30,6 +34,12 @@ const TestPlayer: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reset scroll position when passage changes
+  useEffect(() => {
+    if (leftPaneRef.current) leftPaneRef.current.scrollTop = 0;
+    if (rightPaneRef.current) rightPaneRef.current.scrollTop = 0;
+  }, [currentPassageIndex]);
 
   // Format Timer
   const formatTime = (seconds: number) => {
@@ -52,17 +62,39 @@ const TestPlayer: React.FC = () => {
       }
   }, [isSubmitted, navigate]);
 
+  const getPassageIndexForQuestion = (qId: number) => {
+    return moduleData.testData.passages.findIndex(p => p.questions.some(q => q.id === qId));
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-100 font-sans overflow-hidden">
       {/* HEADER */}
-      <header className="h-16 bg-white border-b border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20">
-        <div className={`text-xl font-bold font-mono flex items-center gap-2 ${timeLeft < 300 ? 'text-red-600 animate-pulse' : 'text-gray-800'}`}>
+      <header className="h-16 bg-white border-b border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-sm">
+        <motion.div 
+            key={timeLeft < 300 ? 'urgent' : 'normal'}
+            initial={{ scale: 1 }}
+            animate={timeLeft < 300 ? { scale: [1, 1.1, 1], opacity: [1, 0.8, 1] } : {}}
+            transition={timeLeft < 300 ? { repeat: Infinity, duration: 1 } : {}}
+            className={`text-xl font-bold font-mono flex items-center gap-2 ${timeLeft < 300 ? 'text-red-600' : 'text-gray-800'}`}
+        >
           <Clock className="w-5 h-5" />
           {formatTime(timeLeft)}
+        </motion.div>
+        
+        <div className="text-gray-900 font-semibold truncate max-w-xl hidden md:block">
+            <AnimatePresence mode="wait">
+                <motion.span
+                    key={currentPassage.title}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                >
+                    {currentPassage.title}
+                </motion.span>
+            </AnimatePresence>
         </div>
-        <div className="text-gray-900 font-semibold truncate max-w-xl">
-          {currentPassage.title}
-        </div>
+        
         <div>
           <button 
             onClick={handleFinish}
@@ -76,16 +108,39 @@ const TestPlayer: React.FC = () => {
       {/* SPLIT SCREEN MAIN */}
       <main className="flex-1 grid grid-cols-1 md:grid-cols-2 overflow-hidden h-full">
         {/* LEFT PANE: PASSAGE */}
-        <section className="bg-white border-r border-gray-300 overflow-y-auto h-full p-8 custom-scrollbar">
-          <div 
-            className="prose max-w-none text-gray-800 leading-7 font-serif text-lg"
-            dangerouslySetInnerHTML={{ __html: currentPassage.content }}
-          />
+        <section 
+          ref={leftPaneRef}
+          className="bg-white border-r border-gray-300 overflow-y-auto h-full p-8 custom-scrollbar relative"
+        >
+          <h2 className="text-xl font-bold mb-4 md:hidden">{currentPassage.title}</h2>
+          <AnimatePresence mode="wait">
+            <motion.div
+                key={currentPassageIndex}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="prose max-w-none text-gray-800 leading-7 font-serif text-lg"
+                dangerouslySetInnerHTML={{ __html: currentPassage.content }}
+            />
+          </AnimatePresence>
         </section>
 
         {/* RIGHT PANE: QUESTIONS */}
-        <section className="bg-gray-50 overflow-y-auto h-full p-8 custom-scrollbar">
+        <section 
+          ref={rightPaneRef}
+          className="bg-gray-50 overflow-y-auto h-full p-8 custom-scrollbar"
+        >
           <div className="max-w-3xl mx-auto space-y-8">
+            <AnimatePresence mode="wait">
+            <motion.div
+                 key={currentPassageIndex}
+                 initial={{ opacity: 0, x: 20 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 exit={{ opacity: 0, x: -20 }}
+                 transition={{ duration: 0.3 }}
+                 className="space-y-8"
+            >
             {currentPassage.questions.map((q) => (
               <div key={q.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                 
@@ -186,57 +241,49 @@ const TestPlayer: React.FC = () => {
 
               </div>
             ))}
+            </motion.div>
+            </AnimatePresence>
           </div>
         </section>
       </main>
 
       {/* FOOTER */}
-      <footer className="h-20 bg-gray-200 border-t border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20">
+      <footer className="h-20 bg-gray-200 border-t border-gray-300 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-4">
            <button 
              onClick={prevPassage} 
              disabled={currentPassageIndex === 0}
-             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
            >
              <ChevronLeft className="w-5 h-5 text-gray-700" />
            </button>
-           <span className="font-semibold text-gray-700">
+           <span className="font-semibold text-gray-700 whitespace-nowrap min-w-[100px] text-center">
              Passage {currentPassageIndex + 1} / {totalPassages}
            </span>
            <button 
              onClick={nextPassage} 
              disabled={currentPassageIndex === totalPassages - 1}
-             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+             className="p-2 rounded-full bg-white border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors shadow-sm"
            >
              <ChevronRight className="w-5 h-5 text-gray-700" />
            </button>
         </div>
 
         {/* QUESTION PALETTE */}
-        <div className="flex-1 overflow-x-auto mx-8 custom-scrollbar">
+        <div className="flex-1 overflow-x-auto mx-4 md:mx-8 custom-scrollbar">
            <div className="flex gap-2 pb-2">
              {allQuestions.map(q => (
                <button
                  key={q.id}
                  onClick={() => {
-                   // Navigate to passage containing this question
-                   // Simple lookup:
-                   const pIdx = Math.floor(allQuestions.findIndex(qs => qs.id === q.id) / 13); // Approx or use proper mapping if needed. 
-                   // Better: Find which passage has this question
-                   // Since I have access to readingData in context, I can do it but for now I'll just check if it's answered.
-                   // NOTE: To make the button jump to the passage, we need to know the passage index.
-                   // Let's assume sequential ID mapping for this specific data set: 
-                   // P1: 1-13, P2: 14-26, P3: 27-40
-                   let targetP = 0;
-                   if (q.id > 13) targetP = 1;
-                   if (q.id > 26) targetP = 2;
-                   setPassage(targetP);
+                   const targetP = getPassageIndexForQuestion(q.id);
+                   if (targetP !== -1) setPassage(targetP);
                  }}
                  className={`
-                   w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold rounded border transition-all
+                   w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold rounded border transition-all duration-200
                    ${userAnswers[q.id] 
-                     ? 'bg-gray-800 text-white border-gray-800' 
-                     : 'bg-white text-gray-600 border-gray-400 hover:border-gray-800'
+                     ? 'bg-gray-800 text-white border-gray-800 transform hover:scale-110' 
+                     : 'bg-white text-gray-600 border-gray-400 hover:border-gray-800 hover:bg-gray-100'
                    }
                    ${q.id >= currentPassage.questions[0].id && q.id <= currentPassage.questions[currentPassage.questions.length-1].id ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
                  `}

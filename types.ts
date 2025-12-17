@@ -15,9 +15,16 @@ export interface VocabItem {
   quiz: QuizOption;
 }
 
+export interface GrammarExample {
+  original: string;
+  nominalized: string;
+  explanation: string;
+}
+
 export interface GrammarSection {
   topic: string;
-  explanation: string;
+  content: string; // Richer HTML explanation
+  examples: GrammarExample[];
   quiz: QuizOption[];
 }
 

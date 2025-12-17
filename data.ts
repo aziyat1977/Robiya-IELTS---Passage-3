@@ -54,10 +54,36 @@ export const readingData: ModuleData = {
   ],
   grammarSection: {
     topic: "Nominalization",
-    explanation: "In academic writing, we often turn verbs (actions) into nouns (concepts). This makes the text sound more objective and formal. Example: 'The population grew' -> 'The growth of the population'.",
+    content: `
+      <p class="mb-4"><strong>Nominalization</strong> is the process of turning verbs (actions) or adjectives (descriptions) into nouns (things). This is a hallmark of academic writing because it shifts the focus from <em>who is doing the action</em> to <em>the concept or result itself</em>.</p>
+      <p class="mb-4">Using nominalization allows you to:</p>
+      <ul class="list-disc pl-5 mb-4 space-y-2">
+        <li>Create a more objective, formal tone.</li>
+        <li>Pack more information into a single sentence (lexical density).</li>
+        <li>Improve text cohesion by linking back to previous ideas.</li>
+      </ul>
+      <p>In the IELTS Reading test, you will often find that the question uses a verb (e.g., "The population grew") while the text uses the nominalized form (e.g., "The growth of the population"). Recognizing this relationship is key to finding answers.</p>
+    `,
+    examples: [
+      {
+        original: "The population grew rapidly in the 19th century.",
+        nominalized: "The rapid <strong>growth</strong> of the population in the 19th century caused overcrowding.",
+        explanation: "Here, the verb 'grew' becomes the noun 'growth'. The adverb 'rapidly' becomes the adjective 'rapid'."
+      },
+      {
+        original: "The chemicals reacted violently when mixed.",
+        nominalized: "The violent <strong>reaction</strong> of the chemicals surprised the scientists.",
+        explanation: "The verb 'reacted' transforms into 'reaction', allowing the sentence to focus on the event rather than the chemicals."
+      },
+      {
+        original: "It is difficult to solve this complex problem.",
+        nominalized: "The <strong>difficulty</strong> of solving this complex problem cannot be overstated.",
+        explanation: "The adjective 'difficult' changes to the abstract noun 'difficulty', making the statement more formal."
+      }
+    ],
     quiz: [
       {
-        question: "", // Adding dummy field to satisfy interface if needed, or mapped below
+        question: "",
         correct: "growth",
         original: "The population grew rapidly.",
         transform: "The rapid ____ of the population caused problems.",
@@ -76,6 +102,27 @@ export const readingData: ModuleData = {
         original: "We must analyse the data.",
         transform: "Careful ____ of the data is required.",
         answer: "analysis"
+      },
+      {
+        question: "",
+        correct: "consumption",
+        original: "Alcohol is consumed excessively.",
+        transform: "Excessive ____ of alcohol is a major health risk.",
+        answer: "consumption"
+      },
+      {
+        question: "",
+        correct: "evolution",
+        original: "The species evolved gradually over millions of years.",
+        transform: "The gradual ____ of the species took millions of years.",
+        answer: "evolution"
+      },
+      {
+        question: "",
+        correct: "participation",
+        original: "Students participated actively in the lesson.",
+        transform: "Active ____ by students is encouraged.",
+        answer: "participation"
       }
     ]
   },

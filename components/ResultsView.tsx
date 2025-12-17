@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useReading } from '../context/ReadingContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Home } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ResultsView: React.FC = () => {
   const { isSubmitted, allQuestions, userAnswers, resetTest } = useReading();
@@ -21,7 +22,6 @@ const ResultsView: React.FC = () => {
       const userAns = userAnswers[q.id]?.trim().toLowerCase();
       const correctAns = q.correctAnswer.trim().toLowerCase();
       
-      // Simple exact match logic. For real IELTS, partials are tricky, but exact match (case insensitive) is standard for CD IELTS mock.
       if (userAns === correctAns) {
         correct++;
       }
@@ -30,7 +30,7 @@ const ResultsView: React.FC = () => {
   };
 
   const score = calculateScore();
-  const bandScore = calculateBand(score); // Rudimentary band calculator
+  const bandScore = calculateBand(score);
 
   function calculateBand(raw: number): string {
       if (raw >= 39) return "9.0";
@@ -48,36 +48,69 @@ const ResultsView: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-12">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8 text-center">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8 text-center"
+        >
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Test Complete!</h1>
           <div className="flex flex-col md:flex-row justify-center items-center gap-8 mt-8">
-            <div className="bg-blue-50 p-6 rounded-xl min-w-[200px]">
+            <motion.div 
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3, type: 'spring' }}
+              className="bg-blue-50 p-6 rounded-xl min-w-[200px]"
+            >
               <div className="text-gray-500 text-sm uppercase tracking-wide font-semibold mb-1">Raw Score</div>
-              <div className="text-5xl font-bold text-blue-600">{score} / 40</div>
-            </div>
-            <div className="bg-green-50 p-6 rounded-xl min-w-[200px]">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-5xl font-bold text-blue-600"
+              >
+                {score} / 40
+              </motion.div>
+            </motion.div>
+            <motion.div 
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.4, type: 'spring' }}
+              className="bg-green-50 p-6 rounded-xl min-w-[200px]"
+            >
               <div className="text-gray-500 text-sm uppercase tracking-wide font-semibold mb-1">Estimated Band</div>
               <div className="text-5xl font-bold text-green-600">{bandScore}</div>
-            </div>
+            </motion.div>
           </div>
           <div className="mt-8 flex justify-center gap-4">
-            <Link to="/reading" onClick={resetTest} className="flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors">
+            <Link to="/reading" onClick={resetTest} className="flex items-center px-6 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
               <Home className="w-4 h-4 mr-2" /> Back to Dashboard
             </Link>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden"
+        >
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 font-semibold text-gray-700">
             Detailed Review
           </div>
           <div className="divide-y divide-gray-100">
-            {allQuestions.map(q => {
+            {allQuestions.map((q, idx) => {
               const userAns = userAnswers[q.id];
               const isCorrect = userAns?.trim().toLowerCase() === q.correctAnswer.trim().toLowerCase();
 
               return (
-                <div key={q.id} className="p-6 hover:bg-gray-50 transition-colors flex flex-col md:flex-row gap-4">
+                <motion.div 
+                  key={q.id} 
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="p-6 hover:bg-gray-50 transition-colors flex flex-col md:flex-row gap-4"
+                >
                   <div className="flex-shrink-0">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                       {q.id}
@@ -102,11 +135,11 @@ const ResultsView: React.FC = () => {
                   <div className="flex-shrink-0 flex items-center">
                       {isCorrect ? <CheckCircle className="w-6 h-6 text-green-500" /> : <XCircle className="w-6 h-6 text-red-500" />}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
