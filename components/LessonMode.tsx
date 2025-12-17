@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { VocabItem, GrammarVisual } from '../types';
+import { VocabItem, GrammarVisual, GrammarExample } from '../types';
 
 // --- Utility: Shuffle Array ---
 const shuffle = <T,>(array: T[]): T[] => {
@@ -110,7 +110,7 @@ const GrammarVisualizer: React.FC<{ visual: GrammarVisual }> = ({ visual }) => {
   }, [visual]);
 
   return (
-    <div className="bg-slate-900/80 rounded-2xl p-6 border border-purple-500/30 shadow-2xl relative overflow-hidden mb-8">
+    <div className="bg-slate-900/80 rounded-2xl p-6 border border-purple-500/30 shadow-2xl relative overflow-hidden mb-8 w-full">
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-blue-500" />
       <h4 className="text-sm font-bold text-purple-300 uppercase tracking-widest mb-6 text-center">{visual.title}</h4>
       
@@ -154,6 +154,12 @@ const GrammarVisualizer: React.FC<{ visual: GrammarVisual }> = ({ visual }) => {
   );
 };
 
+// --- Types for Grammar Slides ---
+type GrammarSlide = 
+  | { type: 'INTRO'; id: string; title: string; content: string }
+  | { type: 'VISUAL'; id: string; title: string; data: GrammarVisual }
+  | { type: 'EXAMPLE'; id: string; title: string; data: GrammarExample };
+
 const LessonMode: React.FC = () => {
   const { moduleData } = useReading();
   const location = useLocation();
@@ -162,6 +168,8 @@ const LessonMode: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'learn' | 'quiz' | 'practice'>('learn');
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [showResults, setShowResults] = useState(false);
+  const [currentVocabIndex, setCurrentVocabIndex] = useState(0);
+  const [currentGrammarIndex, setCurrentGrammarIndex] = useState(0);
 
   // Randomize quiz options on mount or when switching to quiz tab
   const [randomizedItems, setRandomizedItems] = useState<any[]>([]);
@@ -170,6 +178,8 @@ const LessonMode: React.FC = () => {
     setActiveTab('learn');
     setQuizAnswers({});
     setShowResults(false);
+    setCurrentVocabIndex(0);
+    setCurrentGrammarIndex(0);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -186,6 +196,16 @@ const LessonMode: React.FC = () => {
   const title = isVocab ? "Vocabulary Focus" : "Grammar Focus";
   const vocabItems = moduleData.vocabSection;
   const grammar = moduleData.grammarSection;
+
+  // Pre-calculate Grammar Slides
+  const grammarSlides: GrammarSlide[] = useMemo(() => {
+    if (!grammar) return [];
+    return [
+      { type: 'INTRO', id: 'intro', title: grammar.topic, content: grammar.content },
+      ...grammar.visuals.map((v, i) => ({ type: 'VISUAL', id: `vis-${i}`, title: v.title, data: v } as GrammarSlide)),
+      ...grammar.examples.map((e, i) => ({ type: 'EXAMPLE', id: `ex-${i}`, title: `Example ${i + 1}`, data: e } as GrammarSlide))
+    ];
+  }, [grammar]);
 
   const handleQuizSubmit = () => setShowResults(true);
   const resetQuiz = () => {
@@ -252,82 +272,228 @@ const LessonMode: React.FC = () => {
         {activeTab === 'learn' && (
           <motion.div 
             key="learn"
-            initial={{ opacity: 0, rotateY: 90 }}
-            animate={{ opacity: 1, rotateY: 0 }}
-            exit={{ opacity: 0, rotateY: -90 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
             className="perspective-1000"
           >
             {isVocab ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vocabItems.map((item, idx) => (
-                  <motion.div 
-                    key={idx} 
-                    initial={{ opacity: 0, y: 50, rotateX: 20 }}
-                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                    transition={{ delay: idx * 0.1, type: "spring" }}
-                    whileHover={{ scale: 1.02, rotateX: 5 }}
-                    className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all group flex flex-col"
-                  >
-                    <div className="flex-grow">
-                      <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300 mb-2 group-hover:scale-105 origin-left transition-transform">
-                          {item.word}
-                      </h3>
-                      <div className="h-0.5 w-10 bg-gradient-to-r from-blue-500 to-transparent mb-4"></div>
-                      <p className="text-slate-300 leading-relaxed text-lg">{item.definition}</p>
+              // === PAGINATED VOCAB VIEW ===
+              <div className="flex flex-col items-center justify-center min-h-[60vh] relative">
+                 {/* Navigation Controls */}
+                 <div className="absolute top-1/2 left-0 -translate-y-1/2 z-20 hidden md:block">
+                    <button 
+                       onClick={() => setCurrentVocabIndex(prev => Math.max(0, prev - 1))}
+                       disabled={currentVocabIndex === 0}
+                       className="p-4 rounded-full bg-slate-800/50 hover:bg-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 shadow-lg backdrop-blur-sm group"
+                    >
+                       <ChevronLeft className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                 </div>
+                 <div className="absolute top-1/2 right-0 -translate-y-1/2 z-20 hidden md:block">
+                    <button 
+                       onClick={() => setCurrentVocabIndex(prev => Math.min(vocabItems.length - 1, prev + 1))}
+                       disabled={currentVocabIndex === vocabItems.length - 1}
+                       className="p-4 rounded-full bg-slate-800/50 hover:bg-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 shadow-lg backdrop-blur-sm group"
+                    >
+                       <ChevronRight className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                 </div>
+
+                 <AnimatePresence mode="wait">
+                   <motion.div
+                      key={currentVocabIndex}
+                      initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
+                      animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, rotateX: -10 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                      className="text-center max-w-5xl w-full"
+                   >
+                      <motion.h2 
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-[4rem] sm:text-[6rem] md:text-[8rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-200 via-white to-purple-200 leading-tight drop-shadow-[0_0_50px_rgba(59,130,246,0.3)] mb-8 select-none"
+                      >
+                         {vocabItems[currentVocabIndex].word}
+                      </motion.h2>
+                      
+                      <motion.div 
+                         initial={{ width: 0 }}
+                         animate={{ width: 150 }}
+                         transition={{ delay: 0.3 }}
+                         className="h-2 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto mb-12"
+                      />
+                      
+                      <motion.p 
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-2xl md:text-4xl text-slate-300 font-light leading-relaxed max-w-3xl mx-auto"
+                      >
+                         {vocabItems[currentVocabIndex].definition}
+                      </motion.p>
+                   </motion.div>
+                 </AnimatePresence>
+
+                 {/* Pagination Dots & Mobile Controls */}
+                 <div className="mt-16 flex flex-col items-center gap-6">
+                    <div className="flex md:hidden gap-8">
+                       <button 
+                          onClick={() => setCurrentVocabIndex(prev => Math.max(0, prev - 1))}
+                          disabled={currentVocabIndex === 0}
+                          className="p-3 rounded-full bg-slate-800 disabled:opacity-30"
+                       >
+                          <ChevronLeft className="w-6 h-6" />
+                       </button>
+                       <button 
+                          onClick={() => setCurrentVocabIndex(prev => Math.min(vocabItems.length - 1, prev + 1))}
+                          disabled={currentVocabIndex === vocabItems.length - 1}
+                          className="p-3 rounded-full bg-slate-800 disabled:opacity-30"
+                       >
+                          <ChevronRight className="w-6 h-6" />
+                       </button>
                     </div>
-                  </motion.div>
-                ))}
+
+                    <div className="flex gap-3">
+                      {vocabItems.map((_, idx) => (
+                         <button 
+                           key={idx}
+                           onClick={() => setCurrentVocabIndex(idx)}
+                           className={`h-2 rounded-full transition-all duration-300 ${idx === currentVocabIndex ? 'w-12 bg-blue-500 shadow-[0_0_10px_#3b82f6]' : 'w-2 bg-slate-700 hover:bg-slate-600'}`} 
+                         />
+                      ))}
+                    </div>
+                 </div>
               </div>
             ) : (
-              <div className="space-y-12">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div className="bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10"></div>
-                      <h2 className="text-4xl font-black text-white mb-6 flex items-center gap-3">
-                          <Layers className="w-8 h-8 text-purple-400" />
-                          {grammar.topic}
-                      </h2>
-                      <div className="prose prose-invert prose-lg max-w-none text-slate-200" dangerouslySetInnerHTML={{ __html: grammar.content }} />
-                  </div>
-                  
-                  {/* Grammar Visuals */}
-                  <div className="space-y-6">
-                    {grammar.visuals?.map((vis, idx) => (
-                      <GrammarVisualizer key={idx} visual={vis} />
-                    ))}
-                  </div>
-                </div>
-                
-                <h3 className="text-2xl font-bold text-white border-l-4 border-blue-500 pl-4">Concrete Examples</h3>
-                <div className="grid gap-6">
-                    {grammar.examples.map((ex, idx) => (
-                        <motion.div 
-                            key={idx}
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 + (idx * 0.1) }}
-                            className="bg-slate-900/80 p-6 rounded-xl border border-white/10 shadow-lg hover:border-blue-500/50 transition-colors"
-                        >
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Original Sentence</span>
-                                    <p className="text-lg text-slate-300 mt-2 font-medium">{ex.original}</p>
-                                </div>
-                                <div className="md:border-l border-white/10 md:pl-6 relative">
-                                    <div className="absolute top-0 left-0 -ml-3 mt-1 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-xs shadow-lg md:block hidden">
-                                      <ChevronRight className="w-4 h-4 text-white" />
-                                    </div>
-                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Academic Transformation</span>
-                                    <p className="text-lg text-white font-bold mt-2" dangerouslySetInnerHTML={{ __html: ex.nominalized }} />
-                                </div>
-                            </div>
-                            <div className="mt-4 pt-4 border-t border-white/5 flex items-start gap-2 text-sm text-slate-400 italic">
-                                <span className="not-italic">💡</span> {ex.explanation}
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
+              // === PAGINATED GRAMMAR VIEW ===
+              <div className="flex flex-col items-center justify-center min-h-[60vh] relative">
+                 {/* Navigation Controls */}
+                 <div className="absolute top-1/2 left-0 -translate-y-1/2 z-20 hidden md:block">
+                    <button 
+                       onClick={() => setCurrentGrammarIndex(prev => Math.max(0, prev - 1))}
+                       disabled={currentGrammarIndex === 0}
+                       className="p-4 rounded-full bg-slate-800/50 hover:bg-purple-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 shadow-lg backdrop-blur-sm group"
+                    >
+                       <ChevronLeft className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                 </div>
+                 <div className="absolute top-1/2 right-0 -translate-y-1/2 z-20 hidden md:block">
+                    <button 
+                       onClick={() => setCurrentGrammarIndex(prev => Math.min(grammarSlides.length - 1, prev + 1))}
+                       disabled={currentGrammarIndex === grammarSlides.length - 1}
+                       className="p-4 rounded-full bg-slate-800/50 hover:bg-purple-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-white/10 shadow-lg backdrop-blur-sm group"
+                    >
+                       <ChevronRight className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+                    </button>
+                 </div>
+
+                 <AnimatePresence mode="wait">
+                   <motion.div
+                      key={currentGrammarIndex}
+                      initial={{ opacity: 0, scale: 0.9, rotateX: 10 }}
+                      animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, rotateX: -10 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                      className="text-center max-w-6xl w-full"
+                   >
+                     {(() => {
+                        const slide = grammarSlides[currentGrammarIndex];
+                        if (!slide) return null;
+
+                        if (slide.type === 'INTRO') {
+                           return (
+                              <>
+                                 <motion.h2 
+                                    className="text-[4rem] sm:text-[6rem] font-black text-transparent bg-clip-text bg-gradient-to-br from-purple-200 via-white to-pink-200 leading-tight drop-shadow-[0_0_50px_rgba(147,51,234,0.3)] mb-8"
+                                 >
+                                    {slide.title}
+                                 </motion.h2>
+                                 <div className="h-2 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto mb-12 w-[150px]" />
+                                 <motion.div 
+                                    className="prose prose-invert prose-2xl mx-auto text-slate-300 font-light"
+                                    dangerouslySetInnerHTML={{ __html: slide.content }} 
+                                 />
+                              </>
+                           );
+                        }
+
+                        if (slide.type === 'VISUAL') {
+                           return (
+                              <>
+                                 <motion.h2 className="text-[3rem] md:text-[5rem] font-black text-white/90 mb-8 leading-tight">
+                                    {slide.title}
+                                 </motion.h2>
+                                 <div className="h-2 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto mb-12 w-[150px]" />
+                                 <div className="max-w-4xl mx-auto">
+                                    <GrammarVisualizer visual={slide.data} />
+                                 </div>
+                              </>
+                           );
+                        }
+
+                        if (slide.type === 'EXAMPLE') {
+                           return (
+                              <>
+                                 <motion.h2 className="text-[3rem] md:text-[5rem] font-black text-white/90 mb-8 leading-tight">
+                                    {slide.title}
+                                 </motion.h2>
+                                 <div className="h-2 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mb-12 w-[150px]" />
+                                 
+                                 <div className="grid md:grid-cols-2 gap-8 text-left bg-slate-900/80 p-8 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md">
+                                     <div className="flex flex-col justify-center">
+                                         <span className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Original Input</span>
+                                         <p className="text-2xl md:text-3xl text-slate-300 font-medium leading-relaxed">"{slide.data.original}"</p>
+                                     </div>
+                                     <div className="md:border-l border-white/10 md:pl-8 flex flex-col justify-center relative">
+                                         <div className="absolute top-1/2 -left-4 -translate-y-1/2 w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center shadow-[0_0_15px_#9333ea] hidden md:flex">
+                                            <ChevronRight className="w-5 h-5 text-white" />
+                                         </div>
+                                         <span className="text-sm font-bold text-purple-400 uppercase tracking-widest mb-4">Academic Output</span>
+                                         <p className="text-2xl md:text-3xl text-white font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: slide.data.nominalized }} />
+                                     </div>
+                                 </div>
+                                 <p className="mt-8 text-slate-400 text-lg italic flex justify-center items-center gap-2">
+                                    <span className="not-italic text-2xl">💡</span> {slide.data.explanation}
+                                 </p>
+                              </>
+                           );
+                        }
+                     })()}
+                   </motion.div>
+                 </AnimatePresence>
+
+                 {/* Pagination Dots & Mobile Controls */}
+                 <div className="mt-16 flex flex-col items-center gap-6">
+                    <div className="flex md:hidden gap-8">
+                       <button 
+                          onClick={() => setCurrentGrammarIndex(prev => Math.max(0, prev - 1))}
+                          disabled={currentGrammarIndex === 0}
+                          className="p-3 rounded-full bg-slate-800 disabled:opacity-30"
+                       >
+                          <ChevronLeft className="w-6 h-6" />
+                       </button>
+                       <button 
+                          onClick={() => setCurrentGrammarIndex(prev => Math.min(grammarSlides.length - 1, prev + 1))}
+                          disabled={currentGrammarIndex === grammarSlides.length - 1}
+                          className="p-3 rounded-full bg-slate-800 disabled:opacity-30"
+                       >
+                          <ChevronRight className="w-6 h-6" />
+                       </button>
+                    </div>
+
+                    <div className="flex gap-3">
+                      {grammarSlides.map((_, idx) => (
+                         <button 
+                           key={idx}
+                           onClick={() => setCurrentGrammarIndex(idx)}
+                           className={`h-2 rounded-full transition-all duration-300 ${idx === currentGrammarIndex ? 'w-12 bg-purple-500 shadow-[0_0_10px_#a855f7]' : 'w-2 bg-slate-700 hover:bg-slate-600'}`} 
+                         />
+                      ))}
+                    </div>
+                 </div>
               </div>
             )}
           </motion.div>
