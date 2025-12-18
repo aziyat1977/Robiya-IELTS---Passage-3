@@ -259,7 +259,8 @@ const vol1: ModuleData = {
         transform: "The author put ____ on the main point.",
         answer: "emphasis"
       }
-    ]
+    ],
+    practiceTests: []
   },
   testData: {
     timerSeconds: 3600,
@@ -725,7 +726,7 @@ const vol1: ModuleData = {
             correctAnswer: "cascades",
             explanation: {
               en: "Paragraph 6 argues that action at super-leverage points 'can unleash these cascades across sectors'.",
-              ru: "В параграфе 6 утверждается, что действия в точках супер-рычагов «могут вызвать эти каскады (cascades) в других секторах».",
+              ru: "В параграфе 6 утверждает, что действия в точках супер-рычагов «могут вызвать эти каскады (cascades) в других секторах».",
               uz: "6-paragrafda aytilishicha, o'ta kuchli ta'sir nuqtalaridagi harakatlar 'boshqa sohalarda ushbu kaskadlarni (cascades) keltirib chiqarishi mumkin'."
             }
           },
@@ -1091,7 +1092,8 @@ const vol2: ModuleData = {
             transform: "____ the report...",
             answer: "Having finished"
         }
-      ]
+      ],
+      practiceTests: []
     },
     testData: {
       timerSeconds: 3600,

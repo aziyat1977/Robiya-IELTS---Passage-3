@@ -17,7 +17,7 @@ export interface QuizOption {
 
 export interface VocabItem {
   word: string;
-  avatarUrl: string; // New: Image for the teacher avatar
+  avatarUrl: string;
   definition: TranslationSet;
   speakingQuestions: string[];
   quiz: QuizOption[];
@@ -40,12 +40,27 @@ export interface GrammarExample {
   explanation: TranslationSet;
 }
 
+export interface GrammarPracticeQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correct: string;
+  explanation: string;
+}
+
+export interface GrammarPracticeTest {
+  id: number;
+  title: string;
+  questions: GrammarPracticeQuestion[];
+}
+
 export interface GrammarSection {
   topic: string;
   content: TranslationSet;
   visuals: GrammarVisual[];
   examples: GrammarExample[];
   quiz: QuizOption[];
+  practiceTests: GrammarPracticeTest[]; // New: 5 tests of 15 questions
 }
 
 export interface Question {
