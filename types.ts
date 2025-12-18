@@ -15,12 +15,19 @@ export interface QuizOption {
   answer?: string;
 }
 
+export interface WordFormationExercise {
+  root: string;
+  correct: string;
+  sentence: string;
+}
+
 export interface VocabItem {
   word: string;
   avatarUrl: string;
   definition: TranslationSet;
   speakingQuestions: string[];
   quiz: QuizOption[];
+  wordFormation?: WordFormationExercise[]; // New field
 }
 
 export interface GrammarStep {

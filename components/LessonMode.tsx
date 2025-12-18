@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight, ChevronLeft, Globe, Volume2, Brain, Puzzle, Zap, Trophy, Timer, Star } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, RefreshCw, Layers, Mic, Square, Play, Download, ChevronRight, ChevronLeft, Globe, Volume2, Brain, Puzzle, Zap, Trophy, Timer, Star, PenTool } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { VocabItem, GrammarVisual, GrammarExample, TranslationSet, GrammarPracticeTest } from '../types';
+import { VocabItem, GrammarVisual, GrammarExample, TranslationSet, GrammarPracticeTest, WordFormationExercise } from '../types';
 
 // --- Utility: Shuffle Array ---
 const shuffle = <T,>(array: T[]): T[] => {
@@ -76,7 +76,6 @@ const TeacherAvatar: React.FC<{ word: string; avatarUrl: string }> = ({ word, av
 
 // --- Component: Audio Recorder ---
 const AudioRecorder = ({ questionId }: { questionId: string }) => {
-  // ... (Keeping existing implementation)
   const [isRecording, setIsRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -259,9 +258,8 @@ const GrammarTestRunner: React.FC<{ test: GrammarPracticeTest, onExit: () => voi
 
 // --- NEW COMPONENT: Vocab Game Center ---
 const VocabGameCenter: React.FC<{ items: VocabItem[] }> = ({ items }) => {
-    const [mode, setMode] = useState<'menu' | 'memory' | 'matching' | 'blitz'>('menu');
+    const [mode, setMode] = useState<'menu' | 'memory' | 'wordSmith' | 'blitz'>('menu');
     const [score, setScore] = useState(0);
-    const [timer, setTimer] = useState(0);
     const [gameState, setGameState] = useState<any>(null); // Flexible state based on game
 
     // --- MEMORY GAME LOGIC ---
@@ -354,6 +352,35 @@ const VocabGameCenter: React.FC<{ items: VocabItem[] }> = ({ items }) => {
         }
     };
 
+    // --- WORD SMITH (Word Formation) LOGIC ---
+    const startWordSmith = () => {
+        // Gather all word formation exercises from all items
+        const exercises = items.flatMap(item => item.wordFormation || []);
+        if (exercises.length === 0) {
+            alert("No word formation exercises available for this module.");
+            return;
+        }
+        setGameState({ exercises: shuffle(exercises), currentIdx: 0, userInput: '', feedback: null, ended: false });
+        setScore(0);
+        setMode('wordSmith');
+    }
+
+    const handleWordSmithSubmit = () => {
+        const currentEx = gameState.exercises[gameState.currentIdx];
+        const isCorrect = gameState.userInput.trim().toLowerCase() === currentEx.correct.toLowerCase();
+        
+        setGameState(prev => ({ ...prev, feedback: isCorrect ? 'correct' : 'incorrect' }));
+        if (isCorrect) setScore(s => s + 50);
+
+        setTimeout(() => {
+            if (gameState.currentIdx < gameState.exercises.length - 1) {
+                setGameState(prev => ({ ...prev, currentIdx: prev.currentIdx + 1, userInput: '', feedback: null }));
+            } else {
+                setGameState(prev => ({ ...prev, ended: true }));
+            }
+        }, 1500);
+    }
+
     // --- RENDER GAME MENU ---
     if (mode === 'menu') {
         return (
@@ -363,10 +390,10 @@ const VocabGameCenter: React.FC<{ items: VocabItem[] }> = ({ items }) => {
                     <h3 className="text-2xl font-black text-white mb-2">Memory Matrix</h3>
                     <p className="text-blue-100 text-sm">Flip cards to match vocabulary with definitions.</p>
                 </button>
-                <button className="bg-gradient-to-br from-purple-600 to-pink-700 p-8 rounded-2xl shadow-xl hover:scale-105 transition-transform group text-left relative overflow-hidden opacity-50 cursor-not-allowed">
-                    <Puzzle className="w-12 h-12 text-white/80 mb-4" />
-                    <h3 className="text-2xl font-black text-white mb-2">Link Master</h3>
-                    <p className="text-purple-100 text-sm">Coming Soon: Drag and drop matching.</p>
+                <button onClick={startWordSmith} className="bg-gradient-to-br from-purple-600 to-pink-700 p-8 rounded-2xl shadow-xl hover:scale-105 transition-transform group text-left relative overflow-hidden">
+                    <PenTool className="w-12 h-12 text-white/80 mb-4 group-hover:rotate-12 transition-transform" />
+                    <h3 className="text-2xl font-black text-white mb-2">Word Smith</h3>
+                    <p className="text-purple-100 text-sm">Transform root words to fit the sentence context.</p>
                 </button>
                 <button onClick={startBlitz} className="bg-gradient-to-br from-amber-500 to-orange-600 p-8 rounded-2xl shadow-xl hover:scale-105 transition-transform group text-left relative overflow-hidden">
                     <Zap className="w-12 h-12 text-white/80 mb-4 group-hover:animate-pulse" />
@@ -406,6 +433,76 @@ const VocabGameCenter: React.FC<{ items: VocabItem[] }> = ({ items }) => {
                             </div>
                         </motion.div>
                     ))}
+                </div>
+            </div>
+        );
+    }
+
+    // --- RENDER WORD SMITH ---
+    if (mode === 'wordSmith') {
+        if (gameState.ended) {
+            return (
+                <div className="text-center py-12">
+                    <Trophy className="w-24 h-24 text-purple-400 mx-auto mb-6" />
+                    <h2 className="text-4xl font-black text-white mb-4">Training Complete!</h2>
+                    <p className="text-2xl text-slate-300 mb-8">Final Score: <span className="text-emerald-400 font-mono">{score}</span></p>
+                    <button onClick={() => setMode('menu')} className="px-8 py-3 bg-purple-600 rounded-full font-bold">Return to Lobby</button>
+                </div>
+            );
+        }
+        const currentEx = gameState.exercises[gameState.currentIdx];
+        const parts = currentEx.sentence.split('____');
+
+        return (
+            <div className="max-w-3xl mx-auto text-center">
+                 <div className="flex justify-between items-center mb-8">
+                    <h3 className="text-2xl font-bold">Word Smith</h3>
+                    <div className="text-xl font-bold text-white">Score: {score}</div>
+                </div>
+
+                <div className="bg-slate-800 p-10 rounded-3xl border border-white/10 shadow-2xl mb-8">
+                    <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Root Word</div>
+                    <div className="text-4xl font-black text-purple-400 mb-8">{currentEx.root}</div>
+                    
+                    <div className="text-2xl md:text-3xl leading-relaxed text-slate-200 mb-8">
+                        {parts[0]}
+                        <span className="inline-block min-w-[150px] border-b-4 border-dashed border-slate-500 mx-2 text-blue-300">
+                            {gameState.userInput || (gameState.feedback ? currentEx.correct : "")}
+                        </span>
+                        {parts[1]}
+                    </div>
+
+                    <div className="flex justify-center gap-4">
+                        <input 
+                            type="text" 
+                            value={gameState.userInput}
+                            onChange={(e) => setGameState(prev => ({...prev, userInput: e.target.value}))}
+                            disabled={!!gameState.feedback}
+                            className="bg-black/30 border border-slate-600 text-white text-center text-xl rounded-xl px-6 py-3 w-64 focus:ring-2 focus:ring-purple-500 outline-none"
+                            placeholder="Type transformed word..."
+                            onKeyDown={(e) => e.key === 'Enter' && !gameState.feedback && handleWordSmithSubmit()}
+                        />
+                        <button 
+                            onClick={handleWordSmithSubmit}
+                            disabled={!!gameState.feedback || !gameState.userInput}
+                            className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-bold"
+                        >
+                            Check
+                        </button>
+                    </div>
+
+                    {gameState.feedback && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className={`mt-6 text-lg font-bold ${gameState.feedback === 'correct' ? 'text-emerald-400' : 'text-red-400'}`}
+                        >
+                            {gameState.feedback === 'correct' ? 'Correct Transformation!' : `Incorrect. Answer: ${currentEx.correct}`}
+                        </motion.div>
+                    )}
+                </div>
+                <div className="text-slate-500 text-sm">
+                    Exercise {gameState.currentIdx + 1} / {gameState.exercises.length}
                 </div>
             </div>
         );
@@ -455,6 +552,9 @@ const VocabGameCenter: React.FC<{ items: VocabItem[] }> = ({ items }) => {
 
     return null;
 };
+
+// ... (Rest of LessonMode component remains largely the same, just utilizing the updated VocabGameCenter)
+// Note: Ensure the VocabGameCenter component is used inside the 'practice' tab content area.
 
 // --- Types for Grammar Slides ---
 type GrammarSlide = 
