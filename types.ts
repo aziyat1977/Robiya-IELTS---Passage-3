@@ -1,3 +1,4 @@
+
 export type QuestionType = 'TFNG' | 'YES_NO_NOT_GIVEN' | 'GAP_FILL' | 'SHORT_ANSWER' | 'MATCHING_HEADINGS' | 'MCQ';
 
 export interface TranslationSet {
@@ -27,7 +28,7 @@ export interface VocabItem {
   definition: TranslationSet;
   speakingQuestions: string[];
   quiz: QuizOption[];
-  wordFormation?: WordFormationExercise[]; // New field
+  wordFormation?: WordFormationExercise[];
 }
 
 export interface GrammarStep {
@@ -36,14 +37,22 @@ export interface GrammarStep {
   annotation: string;
 }
 
+// MFP: specific visual types
+export type VisualType = 'TIMELINE' | 'FORMULA' | 'TRANSFORMATION';
+
 export interface GrammarVisual {
+  type: VisualType; 
   title: string;
   steps: GrammarStep[];
+  // For timelines
+  timelineData?: { label: string; time: number; active: boolean }[]; 
+  // For formulas
+  formulaItems?: { label: string; color: string }[];
 }
 
 export interface GrammarExample {
   original: string;
-  nominalized: string;
+  nominalized: string; 
   explanation: TranslationSet;
 }
 
@@ -61,13 +70,27 @@ export interface GrammarPracticeTest {
   questions: GrammarPracticeQuestion[];
 }
 
-export interface GrammarSection {
+export interface GrammarUnit {
+  id: string;
+  title: string;
+  description: string;
   topic: string;
-  content: TranslationSet;
-  visuals: GrammarVisual[];
+  
+  // MFP Structure
+  meaning: {
+    text: TranslationSet;
+    context: string;
+  };
+  form: {
+    structure: string;
+    visual: GrammarVisual; // The main visual (Timeline or Formula)
+    explanation: TranslationSet;
+  };
+  
+  visuals: GrammarVisual[]; // Additional visuals if needed
   examples: GrammarExample[];
-  quiz: QuizOption[];
-  practiceTests: GrammarPracticeTest[]; // New: 5 tests of 15 questions
+  quiz: QuizOption[]; // Mini-checks
+  practiceTests: GrammarPracticeTest[]; // Full tests
 }
 
 export interface Question {
@@ -99,6 +122,6 @@ export interface ModuleData {
   subtitle: string;
   description: string;
   vocabSection: VocabItem[];
-  grammarSection: GrammarSection;
+  grammarUnits: GrammarUnit[]; 
   testData: TestData;
 }

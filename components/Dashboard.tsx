@@ -104,6 +104,11 @@ const TiltCard = ({ children, to, gradient, delay }: any) => {
 const Dashboard: React.FC = () => {
   const { moduleData, isTimerActive, activeModuleId, switchModule } = useReading();
 
+  // Safeguard against missing data structures during transition
+  const grammarUnits = moduleData.grammarUnits || [];
+  const grammarTopics = grammarUnits.slice(0, 2).map(u => u.topic).join(', ');
+  const totalPracticeQuestions = grammarUnits.reduce((acc, unit) => acc + (unit.practiceTests?.length || 0), 0);
+
   return (
     <div className="min-h-screen relative overflow-hidden text-white flex flex-col justify-center">
       <ParticleBackground />
@@ -189,7 +194,7 @@ const Dashboard: React.FC = () => {
             </div>
             <h3 className="text-3xl font-bold mb-4 text-white group-hover:text-purple-200 transition-colors">Grammar Matrix</h3>
             <p className="text-slate-300 text-lg flex-grow leading-relaxed">
-              Deconstruct {moduleData.grammarSection.topic} for complex syntactic comprehension with {moduleData.grammarSection.practiceTests.length} practice tests.
+              Deconstruct {grammarUnits.length} advanced units ({grammarTopics}...) with comprehensive visuals and {totalPracticeQuestions > 0 ? totalPracticeQuestions : 'multiple'} practice modules.
             </p>
             <div className="mt-8 flex items-center text-purple-300 font-bold tracking-widest group-hover:translate-x-4 transition-transform duration-300">
               ANALYZE <ChevronRight className="w-5 h-5 ml-2" />
