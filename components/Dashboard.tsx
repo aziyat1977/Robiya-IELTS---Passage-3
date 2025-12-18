@@ -1,38 +1,57 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Laptop, ChevronRight, PlayCircle, Layers, Box, Globe, Archive } from 'lucide-react';
+import { BookOpen, Layers, PlayCircle, ChevronRight, Zap } from 'lucide-react';
 import { useReading } from '../context/ReadingContext';
-import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
-// --- 3D Background Elements ---
-const FloatingShape = ({ delay, color, x, y, size }: any) => (
-  <motion.div
-    initial={{ y: 0, rotate: 0 }}
-    animate={{ y: [0, -20, 0], rotate: [0, 180, 360] }}
-    transition={{ duration: 10, repeat: Infinity, ease: "linear", delay }}
-    className={`absolute blur-2xl opacity-30 rounded-full mix-blend-screen pointer-events-none z-0`}
-    style={{ 
-      background: color, 
-      left: x, 
-      top: y, 
-      width: size, 
-      height: size 
-    }}
-  />
-);
+// --- Particle Background ---
+const ParticleBackground = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {[...Array(25)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full mix-blend-screen bg-blue-500"
+          initial={{ 
+            opacity: 0, 
+            x: Math.random() * window.innerWidth, 
+            y: Math.random() * window.innerHeight,
+            scale: 0
+          }}
+          animate={{ 
+            opacity: [0, 0.4, 0], 
+            y: [null, Math.random() * -150],
+            scale: [0, Math.random() * 2 + 0.5, 0]
+          }}
+          transition={{ 
+            duration: Math.random() * 5 + 8, 
+            repeat: Infinity, 
+            ease: "easeInOut",
+            delay: Math.random() * 5 
+          }}
+          style={{
+            width: Math.random() * 4 + 1 + 'px',
+            height: Math.random() * 4 + 1 + 'px',
+            boxShadow: `0 0 ${Math.random() * 10 + 5}px #3b82f6`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
-// --- 3D Tilt Card Component ---
-const TiltCard = ({ children, to, gradient }: any) => {
+// --- Ultra 3D Tilt Card ---
+const TiltCard = ({ children, to, gradient, delay }: any) => {
   const ref = useRef<HTMLDivElement>(null);
-  
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
+  const brightness = useTransform(mouseYSpring, [-0.5, 0.5], [1.2, 0.8]);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -41,10 +60,8 @@ const TiltCard = ({ children, to, gradient }: any) => {
     const height = rect.height;
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
+    x.set(mouseX / width - 0.5);
+    y.set(mouseY / height - 0.5);
   };
 
   const handleMouseLeave = () => {
@@ -53,26 +70,30 @@ const TiltCard = ({ children, to, gradient }: any) => {
   };
 
   return (
-    <Link to={to} className="block h-full perspective-1000">
+    <Link to={to} className="block h-full perspective-1000 group">
       <motion.div
         ref={ref}
+        initial={{ opacity: 0, y: 50, rotateX: 10 }}
+        animate={{ opacity: 1, y: 0, rotateX: 0 }}
+        transition={{ delay, duration: 0.6, type: "spring" }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className={`relative h-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 shadow-2xl transition-all duration-200 group overflow-hidden`}
+        style={{ rotateX, rotateY, filter: `brightness(${brightness})` }}
+        className={`relative h-full rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-all duration-300 group-hover:border-white/30 overflow-hidden transform-style-3d`}
       >
-        {/* Shiny Highlight Effect */}
-        <motion.div
-          style={{
-            background: useMotionTemplate`radial-gradient(400px circle at ${mouseXSpring.get() * 100 + 50}% ${mouseYSpring.get() * 100 + 50}%, rgba(255,255,255,0.15), transparent 80%)`
-          }}
-          className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
-        />
+        {/* Animated Gradient Background */}
+        <div className={`absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500 bg-gradient-to-br ${gradient}`} />
         
-        {/* Gradient Background base */}
-        <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${gradient} z-[-1]`} />
+        {/* Shine Effect */}
+        <motion.div 
+          className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: "radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%)",
+            transform: "translateZ(1px)"
+          }}
+        />
 
-        <div style={{ transform: "translateZ(30px)" }} className="relative z-10 flex flex-col h-full">
+        <div className="relative z-20 flex flex-col h-full transform-style-3d">
           {children}
         </div>
       </motion.div>
@@ -84,151 +105,121 @@ const Dashboard: React.FC = () => {
   const { moduleData, isTimerActive, activeModuleId, switchModule } = useReading();
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, y: -50, rotateX: 20 }}
-      className="min-h-screen relative overflow-hidden text-white"
-    >
-      {/* Dynamic Background */}
-      <FloatingShape color="#4f46e5" x="10%" y="10%" size="300px" delay={0} />
-      <FloatingShape color="#9333ea" x="80%" y="20%" size="400px" delay={2} />
-      <FloatingShape color="#ec4899" x="30%" y="70%" size="350px" delay={4} />
+    <div className="min-h-screen relative overflow-hidden text-white flex flex-col justify-center">
+      <ParticleBackground />
+      
+      {/* Ambient Light Orbs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-600/20 blur-[120px] rounded-full animate-pulse pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full animate-pulse delay-1000 pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full py-12">
         
-        {/* Module Switcher */}
-        <div className="flex justify-center mb-12">
-            <div className="bg-white/10 backdrop-blur-md p-1 rounded-full border border-white/10 flex">
+        {/* Module Switcher - Liquid Animation */}
+        <motion.div 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.8, type: "spring" }}
+          className="flex justify-center mb-16"
+        >
+            <div className="bg-black/30 backdrop-blur-lg p-1.5 rounded-full border border-white/10 flex relative shadow-2xl">
+                {/* Active Pill Background */}
+                <motion.div
+                  layoutId="activeModulePill"
+                  className={`absolute top-1.5 bottom-1.5 rounded-full ${activeModuleId === 'vol1' ? 'bg-blue-600 left-1.5' : 'bg-purple-600 right-1.5'}`}
+                  style={{ width: 'calc(50% - 6px)' }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+                
                 <button 
                     onClick={() => switchModule('vol1')}
-                    className={`px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all ${activeModuleId === 'vol1' ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                    className={`relative z-10 px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-colors ${activeModuleId === 'vol1' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
                 >
                     Volume 01
                 </button>
                 <button 
                      onClick={() => switchModule('vol2')}
-                     className={`px-6 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all ${activeModuleId === 'vol2' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+                     className={`relative z-10 px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-colors ${activeModuleId === 'vol2' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
                 >
                     Volume 02
                 </button>
             </div>
-        </div>
+        </motion.div>
 
-        <header className="mb-20 text-center">
+        <header className="mb-24 text-center">
           <motion.div
-            key={activeModuleId} // Re-animate on switch
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 100 }}
-            className="inline-block"
+            key={activeModuleId}
+            initial={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
+            animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+            transition={{ type: "spring", bounce: 0.4 }}
           >
-            <h1 className="text-5xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mb-4 drop-shadow-lg tracking-tight">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-indigo-300 to-purple-300 mb-6 drop-shadow-[0_0_30px_rgba(59,130,246,0.3)] tracking-tight">
               {moduleData.title}
             </h1>
           </motion.div>
           
-          <motion.div
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 0.3 }}
-             className="flex justify-center gap-2 mb-6"
-          >
-            <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/50 text-blue-200 text-xs font-mono uppercase tracking-widest">
-              {activeModuleId === 'vol1' ? 'Volume 01' : 'Volume 02'}
-            </span>
-            <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/50 text-purple-200 text-xs font-mono uppercase tracking-widest">
-              Academic
-            </span>
-          </motion.div>
-
           <motion.p 
             key={moduleData.subtitle}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-xl text-blue-100/80 font-light max-w-2xl mx-auto leading-relaxed"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl text-slate-300 font-light max-w-3xl mx-auto leading-relaxed"
           >
             {moduleData.subtitle}
           </motion.p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 perspective-1000">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* Vocab Card */}
-          <motion.div 
-            initial={{ x: -50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="h-full"
-          >
-            <TiltCard to="/reading/vocab" gradient="from-blue-600 to-cyan-500">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
-                <BookOpen className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Vocabulary Core</h3>
-              <p className="text-blue-200 flex-grow">
-                Master {moduleData.vocabSection.length} high-frequency academic terms found in this volume.
-              </p>
-              <div className="mt-6 flex items-center text-cyan-300 font-bold tracking-wide group-hover:translate-x-2 transition-transform">
-                INITIATE <ChevronRight className="w-5 h-5 ml-2" />
-              </div>
-            </TiltCard>
-          </motion.div>
+          <TiltCard to="/reading/vocab" gradient="from-cyan-500 to-blue-600" delay={0.3}>
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-400 to-blue-500 flex items-center justify-center mb-8 shadow-lg shadow-cyan-500/30 transform group-hover:scale-110 transition-transform duration-300">
+              <BookOpen className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-3xl font-bold mb-4 text-white group-hover:text-cyan-200 transition-colors">Vocabulary Core</h3>
+            <p className="text-slate-300 text-lg flex-grow leading-relaxed">
+              Initialize neural pathways with {moduleData.vocabSection.length} high-frequency academic terms including word formation.
+            </p>
+            <div className="mt-8 flex items-center text-cyan-300 font-bold tracking-widest group-hover:translate-x-4 transition-transform duration-300">
+              INITIATE <ChevronRight className="w-5 h-5 ml-2" />
+            </div>
+          </TiltCard>
 
-          {/* Grammar Card */}
-          <motion.div
-             initial={{ y: 50, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ delay: 0.4 }}
-             className="h-full"
-          >
-            <TiltCard to="/reading/grammar" gradient="from-purple-600 to-pink-500">
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-500 to-pink-400 flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30">
-                <Layers className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-white">Grammar Matrix</h3>
-              <p className="text-purple-200 flex-grow">
-                Deconstruct {moduleData.grammarSection.topic} for complex comprehension.
-              </p>
-              <div className="mt-6 flex items-center text-pink-300 font-bold tracking-wide group-hover:translate-x-2 transition-transform">
-                ANALYZE <ChevronRight className="w-5 h-5 ml-2" />
-              </div>
-            </TiltCard>
-          </motion.div>
+          <TiltCard to="/reading/grammar" gradient="from-purple-500 to-pink-600" delay={0.4}>
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-purple-400 to-pink-500 flex items-center justify-center mb-8 shadow-lg shadow-purple-500/30 transform group-hover:scale-110 transition-transform duration-300">
+              <Layers className="w-10 h-10 text-white" />
+            </div>
+            <h3 className="text-3xl font-bold mb-4 text-white group-hover:text-purple-200 transition-colors">Grammar Matrix</h3>
+            <p className="text-slate-300 text-lg flex-grow leading-relaxed">
+              Deconstruct {moduleData.grammarSection.topic} for complex syntactic comprehension with {moduleData.grammarSection.practiceTests.length} practice tests.
+            </p>
+            <div className="mt-8 flex items-center text-purple-300 font-bold tracking-widest group-hover:translate-x-4 transition-transform duration-300">
+              ANALYZE <ChevronRight className="w-5 h-5 ml-2" />
+            </div>
+          </TiltCard>
 
-          {/* Test Card */}
-          <motion.div
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="h-full"
-          >
-            <TiltCard to="/reading/test" gradient={isTimerActive ? "from-amber-500 to-orange-600" : "from-emerald-500 to-teal-600"}>
-               <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-colors ${
-                 isTimerActive 
-                   ? 'bg-gradient-to-tr from-amber-500 to-orange-400 shadow-orange-500/30' 
-                   : 'bg-gradient-to-tr from-emerald-500 to-teal-400 shadow-emerald-500/30'
-               }`}>
-                {isTimerActive ? <PlayCircle className="w-8 h-8 text-white animate-pulse" /> : <Box className="w-8 h-8 text-white" />}
-              </div>
-              <h3 className="text-2xl font-bold mb-3 text-white">
-                {isTimerActive ? "Resume Simulation" : "Begin Simulation"}
-              </h3>
-              <p className="text-white/80 flex-grow">
-                {isTimerActive 
-                    ? "Re-enter the testing environment." 
-                    : "Full 60-minute IELTS simulation. 40 Questions."}
-              </p>
-              <div className="mt-6 flex items-center text-white font-bold tracking-wide group-hover:translate-x-2 transition-transform">
-                {isTimerActive ? "RESUME" : "LAUNCH"} <ChevronRight className="w-5 h-5 ml-2" />
-              </div>
-            </TiltCard>
-          </motion.div>
+          <TiltCard to="/reading/test" gradient={isTimerActive ? "from-amber-500 to-orange-600" : "from-emerald-500 to-teal-600"} delay={0.5}>
+             <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-8 shadow-lg transform group-hover:scale-110 transition-transform duration-300 ${
+               isTimerActive 
+                 ? 'bg-gradient-to-tr from-amber-400 to-orange-500 shadow-orange-500/30' 
+                 : 'bg-gradient-to-tr from-emerald-400 to-teal-500 shadow-emerald-500/30'
+             }`}>
+              {isTimerActive ? <Zap className="w-10 h-10 text-white animate-pulse" /> : <PlayCircle className="w-10 h-10 text-white" />}
+            </div>
+            <h3 className="text-3xl font-bold mb-4 text-white group-hover:text-emerald-200 transition-colors">
+              {isTimerActive ? "Resume Simulation" : "Test Simulation"}
+            </h3>
+            <p className="text-slate-300 text-lg flex-grow leading-relaxed">
+              {isTimerActive 
+                  ? "Re-enter the testing environment immediately." 
+                  : "Full 60-minute IELTS simulation. 40 Questions."}
+            </p>
+            <div className={`mt-8 flex items-center font-bold tracking-widest group-hover:translate-x-4 transition-transform duration-300 ${isTimerActive ? 'text-amber-300' : 'text-emerald-300'}`}>
+              {isTimerActive ? "RESUME" : "LAUNCH"} <ChevronRight className="w-5 h-5 ml-2" />
+            </div>
+          </TiltCard>
 
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
